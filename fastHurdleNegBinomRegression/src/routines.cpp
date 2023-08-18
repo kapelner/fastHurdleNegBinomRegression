@@ -71,18 +71,32 @@ public:
     		}
     	}
 
-    	//then compute all the 2*p + 1 partial derivatives (i.e., the entries in the gradient)
+    	//then compute all the 2 * p + 1 partial derivatives (i.e., the entries in the gradient)
     	for (int j = 0; j < (2 * p + 1); j++){ //initialize
     		grad[j] = 0;
     	}
     	for (int i = 0; i < n; i++){
-        	for (int j = 0; j < p; j++){
-        		grad[j] += 1;
-        	}
-        	for (int j = p; j < 2 * p; j++){
-        		grad[j - p] += 1;
-        	}
-        	grad[2 * p + 1] += 1;
+    		Eigen::VectorXd x_i = X.row(i);
+    		double y_i_minus_one = y[i] - 1;
+    		double exp_etas_i = exp_etas[i];
+    		double exp_neg_etas_i = exp_neg_etas[i];
+    		double exp_xis_i = exp_xis[i];
+    		double exp_neg_xis_i = exp_neg_xis[i];
+    		if (z[i] == 1){
+            	for (int j = 0; j < p; j++){
+            		grad[j] += x_i(j) / (1 + exp_etas_i);
+            	}
+     		} else {
+            	for (int j = 0; j < p; j++){
+            		grad[j] -= x_i(j) / (1 + exp_neg_etas_i);
+            		grad[j] -= phi / (1 + phi * exp_neg_etas_i);
+            	}
+            	for (int j = p; j < 2 * p; j++){
+            		grad[j - p] += x_i(j) * y_i_minus_one * phi / (phi + exp_xis_i);
+            		grad[j - p] -= x_i(j) * phi / (1 + phi * exp_neg_xis_i);
+            	}
+            	grad[2 * p + 1] += 1;
+     		}
     	}
 
         return -loglik; //we must return the cost as the *negative* log likelihood as the algorithm *minimizes* cost (thus it will maximize likelihood)

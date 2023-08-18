@@ -149,13 +149,13 @@ z_i \natlog{\inverse{1 + \exp{-\eta_i}}} +
 
 \noindent We seek to maximize this quantity over the parameters. We can start the parameters from an intelligent point by fitting a logistic regression to the $z_i$'s and returning a starting point for the $\gamma_j$'s. Then we can fit an OLS model to the $y_i$'s which are nonzero returning a starting point for the $\beta_j$'s.
 
-When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with respect to all of our parameters, i.e. $\gamma_0, \gamma_1, \ldots, \gamma_p, \beta_0, \beta_1, \ldots, \beta_p, \phi$. We now derive them. First when $z_i = 1$,
+When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with respect to all of our parameters, i.e. $\gamma_0, \gamma_1, \ldots, \gamma_p, \beta_0, \beta_1, \ldots, \beta_p, \phi$. We now derive them. Assume the first column of the covariate matrix is 1.  First when $z_i = 1$,
 
 %\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}
 %\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}
 
 \beqn
-\partialop{\ell}{\gamma_0} &:=& \inverse{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}} \\
+%\partialop{\ell}{\gamma_0} &:=& \inverse{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}} \\
 \partialop{\ell}{\gamma_k} &:=& x_{i,k} \inverse{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}}
 \eeqn
 
@@ -167,9 +167,9 @@ When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with re
 %derivative of -(y-1)* ln(1 + x * exp(-c)) wrt x
 %derivative of -x* ln(1 + (1/x) * exp(c)) wrt x
 \beqn
-\partialop{\ell}{\gamma_0} &:=& -\inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})} \\
+%\partialop{\ell}{\gamma_0} &:=& -\inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})} \\
 \partialop{\ell}{\gamma_k} &:=& -x_{i,k} \inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})} \\
-\partialop{\ell}{\beta_0} &:=& (y_i - 1)\phi \inverse{\phi + \exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} + \\
+%\partialop{\ell}{\beta_0} &:=& (y_i - 1)\phi \inverse{\phi + \exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} + \\
 && -\phi\inverse{1 + \phi\exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}})}
  \\
 \partialop{\ell}{\beta_k} &:=& x_{i,k} (y_i - 1)\phi \inverse{\phi + \exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} + \\

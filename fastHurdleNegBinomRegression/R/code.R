@@ -73,7 +73,7 @@ fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_
 			collinear_variables = c(collinear_variables, bad_var)
 		}
 		repeat {
-			b = coef(lm.fit(Xmm_y_pos, y, tol = lm_fit_tol))
+			b = coef(lm.fit(Xmm_y_pos, y_pos, tol = lm_fit_tol))
 			b_NA = b[is.na(b)]
 			if (length(b_NA) == 0){
 				break
@@ -87,9 +87,9 @@ fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_
 	
 	#now we get the initial starting vals
 	gammas_0 = fastLogisticRegressionWrap::fast_logistic_regression(Xmm, z)$coefficients
-	betas_0 = coef(lm.fit(Xmm_y_pos, y))
+	betas_0 = coef(lm.fit(Xmm_y_pos, log(y_pos - 1))) #the neg binomial model fits in log space
 	
-	flr = fast_hnb_cpp(Xmm, y, z, c(gammas_0, betas_0, initial_phi), ...)
+	flr = fast_hnb_cpp(Xmm, y, z, c(gammas_0, betas_0, initial_phi), ...) 
 	flr$Xmm = Xmm
 	flr$y = y
 	flr$gammas_0 = gammas_0
