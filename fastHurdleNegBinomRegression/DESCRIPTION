@@ -1,0 +1,19 @@
+Package: fastHurdleNegBinomRegression
+Type: Package
+Title: Fast Hurdle Negative Binomial Model Fitter
+Date: 2023-xx-xx
+Version: 1.0.0
+Authors@R: c(
+	person("Adam", "Kapelner", email = "kapelner@qc.cuny.edu",           role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5985-6792")),
+	person("Beau", "Walker",   email = "beau@methoddatascience.com",     role = c("rev", "dtc"), comment = c(ORCID = "0000-0001-7872-4007")),
+	person("Gabriel", "Mayer", email = "gmayer@revelartechnologies.com", role = c("fnd", "dtc"))
+  )
+License: GPL-3
+Description: Provides fast Hurdle Inflated Negative Binomial Model fitting.
+Encoding: UTF-8
+Depends: R (>= 4.0.0)
+Imports: RcppNumerical, Rcpp, fastLogisticRegressionWrap, checkmate, stats, MASS, methods
+LinkingTo: Rcpp, RcppEigen, RcppNumerical
+URL: https://github.com/kapelner/fastZINB
+BugReports: https://github.com/kapelner/fastZINB/issues
+RoxygenNote: 7.2.3

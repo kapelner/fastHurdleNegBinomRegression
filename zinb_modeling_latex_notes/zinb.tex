@@ -1,0 +1,186 @@
+\documentclass[12pt]{article}
+
+\input{preamble}
+%\usepackage{setspace}
+%\voublespacing
+
+
+\newcommand{\ourtitle}{Notes on Hurdle Negative Binomial Regression}
+\title{\ourtitle}
+\author[1]{Adam Kapelner}
+\affil[1]{\small Department of Mathematics, Queens College, CUNY, USA}
+
+\begin{document}
+\maketitle
+
+We begin with examining the zero-inflated model and then talk about why it's wiser to go with the hurdle model. 
+
+So we start by modeling count data using a negative binomial model where the zeroes are inflated. Let inflation be defined as the latent variable $I_i = 1$ and uninflated be $I_i = 0$. We first define the probability $p_i$ of an inflated zero using a generalized linear model (GLM) as
+
+\beqn
+p_i  := \cprob{Y_i = 0}{I_i = 1} := \frac{1}{1 + \exp{-\eta_i}} = (1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p})})^{-1}
+\eeqn
+
+\noindent And conveniently
+
+\beqn
+1 - p_i  = \frac{1}{1 + \exp{\eta_i}} = (1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})^{-1}
+\eeqn
+
+\noindent We then define the count model for $y_i$ which is uninflated $I_i = 0$ as the negative binomial model parameterized with the mean as stated \href{https://mc-stan.org/docs/2_20/functions-reference/nbalt.html}{here} and a generalized linear model (GLM):
+
+\beqn
+\cprob{Y_i = y_i}{I_i = 0} &=& \binom{y_i + \phi - 1}{y_i} \tothepow{\frac{\mu_i}{\mu_i + \phi}}{y_i} \tothepow{\frac{\phi}{\mu_i + \phi}}{\phi} \\
+&=& \frac{\Gammaf{y_i + \phi - 2}}{y_i! \,\Gammaf{\phi - 2}} \tothepow{\frac{\mu_i}{\mu_i + \phi}}{y_i} \tothepow{\frac{\phi}{\mu_i + \phi}}{\phi} \\
+&=& \frac{\Gammaf{y_i + \phi - 2}}{y_i! \,\Gammaf{\phi - 2}} \tothepow{\frac{\exp{\xi_i}}{\exp{\xi_i} + \phi}}{y_i} \tothepow{\frac{\phi}{\exp{\xi_i} + \phi}}{\phi} \\
+&=& \frac{\Gammaf{y_i + \phi - 2}}{y_i! \,\Gammaf{\phi - 2}} \tothepow{1 + \phi\exp{-\xi_i}}{-y_i} \tothepow{1 + \phi^{-1}\exp{\xi_i}}{-\phi} \\
+&=& \frac{\Gammaf{y_i + \phi - 2}}{y_i! \,\Gammaf{\phi - 2}} \tothepow{1 + \phi\exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p})}}{-y_i} \times \\
+&& \tothepow{1 + \phi^{-1}\exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}}{-\phi}
+\eeqn
+
+%\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}
+%\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}
+
+\noindent Which means the probability of any realization would be
+
+\beqn
+\prob{Y_i = y_i} = \cprob{Y_i = 0}{I_i = 1} \indic{y_i = 0} + (1 - \cprob{Y_i = 0}{I_i = 1}) \cprob{Y_i = y_i}{I_i = 0}.
+\eeqn
+
+%\noindent This can be simplified a little bit if we augment the dataset with an indicator $z_i := \indic{y_i = 0}$ so that:
+%
+%\beqn
+%\prob{Y_i = y_i, Z_i = z_i} = \cprob{Y_i = 0}{I_i = 1}^{z_i} + (1 - \cprob{Y_i = 0}{I_i = 1}) \cprob{Y_i = y_i}{I_i = 0}.
+%\eeqn
+
+The problem is that plus sign will destroy the optimization because you can't log it effectively. Let's now consider the hurdle model.
+
+Here, there is a probability of zero. And if it \qu{jumps the hurdle} then we get a positive realization model. We can still model the positive realizations with a negative binomial model by just subtracting one from the counts to shift the support from $\braces{1,2,\ldots}$ to $\braces{0,1,\ldots}$. The hurdle is then defined as before where this time there is no latent \qu{inflation} variable:
+
+\beqn
+p_i  &:=& \prob{Y_i = 0} := \inverse{1 + \exp{-\eta_i}} = \inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p})}} \\
+1 - p_i &=& \inverse{1 + \exp{\eta_i}}
+\eeqn
+
+The positive realization model is then defined as before except now we subtract one from every $y_i$ to shift the support correctly. FROM THIS POINT ON, all $y_ i\geq 1$.
+
+\beqn
+\cprob{Y_i = y_i}{Y_i > 0} &=& \binom{y_i + \phi - 2}{y_i - 1} \tothepow{\frac{\mu_i}{\mu_i + \phi}}{y_i - 1} \tothepow{\frac{\phi}{\mu_i + \phi}}{\phi} \\
+&=& \frac{\Gammaf{y_i + \phi - 3}}{(y_i - 1)! \,\Gammaf{\phi - 2}} \tothepow{\frac{\mu_i}{\mu_i + \phi}}{y_i - 1} \tothepow{\frac{\phi}{\mu_i + \phi}}{\phi} \\
+&=& \frac{\Gammaf{y_i + \phi - 3}}{(y_i - 1)! \,\Gammaf{\phi - 2}} \tothepow{\frac{\exp{\xi_i}}{\exp{\xi_i} + \phi}}{y_i - 1} \tothepow{\frac{\phi}{\exp{\xi_i} + \phi}}{\phi} \\
+&=& \frac{\Gammaf{y_i + \phi - 3}}{(y_i - 1)! \,\Gammaf{\phi - 2}} \tothepow{1 + \phi\exp{-\xi_i}}{-(y_i - 1)} \tothepow{1 + \phi^{-1}\exp{\xi_i}}{-\phi} \\
+%
+&=& \frac{\Gammaf{y_i + \phi - 3}}{(y_i - 1)! \,\Gammaf{\phi - 2}} \tothepow{1 + \phi\exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p})}}{-(y_i - 1)} \times \\
+&& \tothepow{1 + \phi^{-1}\exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}}{-\phi}
+\eeqn
+
+\noindent Which means the probability of any realization would be
+
+\beqn
+\prob{Y_i = y_i} = \prob{Y_i = 0}\indic{y_i = 0} + (1 - \prob{Y_i = 0}) \cprob{Y_i = y_i}{Y_i > 0} \indic{y_i > 0}.
+\eeqn
+
+\noindent We can make life easier by defining the augmented data $z_i := \indic{y_i = 0}$ to obtain:
+
+\beqn
+\prob{Y_i = y_i, Z_i = z_i} &=& \prob{Y_i = 0}^{z_i} \parens{(1 - \prob{Y_i = 0}) \cprob{Y_i = y_i}{Y_i > 0}}^{1 - z_i} \\
+&=& p_i^{z_i} \parens{(1 - p_i) \cprob{Y_i = y_i}{Y_i > 0}}^{1 - z_i} \\
+\eeqn
+
+\noindent The total likelihood function will be:
+
+\beqn
+&& \mathcal{L}(\gamma_0, \gamma_1, \ldots, \gamma_p, \beta_0, \beta_1, \ldots, \beta_p, \phi \,|\, y_1, \ldots, y_n, z_1, \ldots, z_n) \\
+&=& \prod_{i=1}^n  p_i^{z_i} \parens{(1 - p_i) \cprob{Y_i = y_i}{Y_i > 0}}^{1 - z_i}
+%&=& \prod_{i=1}^n \tothepow{1 + \exp{-\eta_i}}{-z_i} 
+%\Big(
+%\parens{1 - \inverse{1 + \exp{-\eta_i}}} \times \\
+%&& \frac{\Gammaf{y_i + \phi - 3}}{(y_i - 1)! \,\Gammaf{\phi - 2}} \tothepow{1 + \phi\exp{-\xi_i}}{-(y_i - 1)} \tothepow{1 + \phi^{-1}\exp{\xi_i}}{-\phi}
+%\Big)^{1 - z_i} \\
+\eeqn
+
+
+\noindent And the log-likelihood will be
+
+\beqn
+&& \ell(\gamma_0, \gamma_1, \ldots, \gamma_p, \beta_0, \beta_1, \ldots, \beta_p, \phi \,|\, y_1, \ldots, y_n, z_1, \ldots, z_n) \\
+&=& \sum_{i=1}^n  z_i \natlog{p_i} + (1-z_i)\natlog{1 - p_i} +  (1-z_i)\natlog{\cprob{Y_i = y_i}{Y_i > 0}} \\
+&=& \sum_{i=1}^n  
+z_i \natlog{\inverse{1 + \exp{-\eta_i}}} + 
+(1 - z_i)\natlog{\inverse{1 + \exp{\eta_i}}} + \\
+&& (1 - z_i)\natlog{\frac{\Gammaf{y_i + \phi - 3}}{(y_i - 1)! \,\Gammaf{\phi - 2}} \tothepow{1 + \phi\exp{-\xi_i}}{-(y_i - 1)} \tothepow{1 + \phi^{-1}\exp{\xi_i}}{-\phi}} \\
+%%
+&=& \sum_{i=1}^n  
+-z_i \natlog{1 + \exp{-\eta_i}} - 
+(1 - z_i)\natlog{1 + \exp{\eta_i}} + \\
+&& (1 - z_i)\natlog{\frac{\Gammaf{y_i + \phi - 3}}{(y_i - 1)! \,\Gammaf{\phi - 2}}} + \\
+&& (1 - z_i) \natlog{\tothepow{1 + \phi\exp{-\xi_i}}{-(y_i - 1)}} + \\
+&& (1 - z_i) \natlog{\tothepow{1 + \phi^{-1}\exp{\xi_i}}{-\phi}} \\
+%%%
+&=& \sum_{i=1}^n  
+-z_i \natlog{1 + \exp{-\eta_i}} + \\
+&& -(1 - z_i)\natlog{1 + \exp{\eta_i}} + \\
+&& (1 - z_i)\parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
+&& -(y_i - 1)(1 - z_i) \natlog{1 + \phi\exp{-\xi_i}} + \\
+&& -\phi(1 - z_i) \natlog{1 + \phi^{-1}\exp{\xi_i}} \\
+%%%
+&=& \sum_{i=1}^n  
+-z_i \natlog{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p})}} + \\
+&& -(1 - z_i)\natlog{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}} + \\
+&& (1 - z_i)\parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
+&& -(y_i - 1)(1 - z_i) \natlog{1 + \phi\exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p})}} + \\
+&& -\phi(1 - z_i) \natlog{1 + \phi^{-1}\exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}}
+\eeqn
+
+\noindent To simplify this a little bit, note that when $z_i = 1$, the summand simplifies to:
+
+\beqn
+-\natlog{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p})}}
+\eeqn
+
+\noindent And when $z_i = 0$, the summand simplifies to:
+
+\beqn
+&& -\natlog{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}} + \\
+&& \parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
+&& -(y_i - 1)\natlog{1 + \phi\exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p})}} + \\
+&& -\phi\natlog{1 + \phi^{-1}\exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}}
+\eeqn
+
+\noindent We seek to maximize this quantity over the parameters. We can start the parameters from an intelligent point by fitting a logistic regression to the $z_i$'s and returning a starting point for the $\gamma_j$'s. Then we can fit an OLS model to the $y_i$'s which are nonzero returning a starting point for the $\beta_j$'s.
+
+When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with respect to all of our parameters, i.e. $\gamma_0, \gamma_1, \ldots, \gamma_p, \beta_0, \beta_1, \ldots, \beta_p, \phi$. We now derive them. First when $z_i = 1$,
+
+%\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}
+%\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}
+
+\beqn
+\partialop{\ell}{\gamma_0} &:=& \inverse{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}} \\
+\partialop{\ell}{\gamma_k} &:=& x_{i,k} \inverse{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}}
+\eeqn
+
+\noindent All other gradients are zero. Then when $z_i = 0$,
+
+%wolfram alpha searches
+%derivative of -(y-1)* ln(1 + phi * exp(-(d*x + c))) wrt x
+%derivative of -phi * ln(1 + (1/phi) * exp((x + c))) wrt x
+%derivative of -(y-1)* ln(1 + x * exp(-c)) wrt x
+%derivative of -x* ln(1 + (1/x) * exp(c)) wrt x
+\beqn
+\partialop{\ell}{\gamma_0} &:=& -\inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})} \\
+\partialop{\ell}{\gamma_k} &:=& -x_{i,k} \inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})} \\
+\partialop{\ell}{\beta_0} &:=& (y_i - 1)\phi \inverse{\phi + \exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} + \\
+&& -\phi\inverse{1 + \phi\exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}})}
+ \\
+\partialop{\ell}{\beta_k} &:=& x_{i,k} (y_i - 1)\phi \inverse{\phi + \exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} + \\
+&& -x_{i,k} \phi\inverse{1 + \phi\exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}})}
+ \\
+\partialop{\ell}{\phi} &:=& \psi(y_i + \phi - 3) - \psi(\phi - 2) +\\
+&& - (y_i - 1) \inverse{\phi +  \exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} + \\
+&& \inverse{1 + \phi \exp{-(\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} - \natlog{\phi + \exp{\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}}} + \natlog{\phi}
+\eeqn
+
+\noindent where $\psi$ denots the digamma function.
+
+
+\end{document}

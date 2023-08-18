@@ -1,0 +1,738 @@
+%packages
+%\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{placeins}
+\usepackage{amssymb}
+%\usepackage{wasysym}
+%\usepackage{cancel}
+\usepackage{abstract}
+\usepackage[auth-sc,affil-sl]{authblk}
+\usepackage{hyperref}
+\usepackage{apacite}
+%\usepackage{parskip}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage[xcdraw,table]{xcolor}
+\usepackage{natbib}
+%\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algcompatible}
+\usepackage{algpseudocode}
+\usepackage[table]{xcolor}
+\usepackage{multirow}
+\usepackage{amsthm}
+%\usepackage{tikz}
+%\usetikzlibrary{automata}
+%\usetikzlibrary{arrows}
+
+%\usepackage{pstricks,pst-node,pst-tree}
+
+\usepackage{algpseudocode}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\usepackage{bbding}
+\usepackage{listings}
+\usepackage{appendix}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{fancyvrb}
+%\geometry{papersize={8.5in,11in},total={6.5in,9in}}
+\usepackage{cancel}
+%\usepackage{algorithmic, algorithm}
+%
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{remark}{Remark}[section]
+\newtheorem{lemma}{Lemma}[theorem]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{conjecture}{Conjecture}[theorem]
+\newtheorem{assumption}{Assumption}[section]
+
+
+\newcounter{probnum}
+\setcounter{probnum}{1}
+
+%create definition to allow local margin changes
+\def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+\let\endchangemargin=\endlist 
+
+%allow equations to span multiple pages
+\allowdisplaybreaks
+
+%define colors and color typesetting conveniences
+\definecolor{tabblue}{rgb}{.870588,.905882,.94902}
+\definecolor{gray}{rgb}{0.7,0.7,0.7}
+\definecolor{black}{rgb}{0,0,0}
+\definecolor{white}{rgb}{1,1,1}
+\definecolor{blue}{rgb}{0.0,0.0,1}
+\newcommand{\ingray}[1]{\color{gray}#1\color{black}}
+\newcommand{\ingrey}[1]{\color{gray}#1\color{black}}
+\newcommand{\inblue}[1]{\color{blue}#1\color{black}}
+\definecolor{green}{rgb}{0,0.5,0}
+\newcommand{\ingreen}[1]{\color{green}#1\color{black}}
+\definecolor{yellow}{rgb}{1,0.549,0}
+\newcommand{\inyellow}[1]{\color{yellow}#1 \color{black}}
+\definecolor{red}{rgb}{0.6,0.0,0.0}
+\newcommand{\inred}[1]{\color{red}#1\color{black}}
+\definecolor{darkred}{rgb}{0.9,0.4,0}
+\newcommand{\indarkred}[1]{\color{darkred}#1\color{black}}
+\definecolor{purple}{rgb}{0.58,0,0.827}
+\newcommand{\inpurple}[1]{\color{purple}#1 \color{black}}
+\definecolor{backgcode}{rgb}{0.97,0.97,0.8}
+\definecolor{Brown}{cmyk}{0,0.81,1,0.60}
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+
+%define new math operators
+\DeclareMathOperator*{\argmax}{arg\,max~}
+\DeclareMathOperator*{\argmin}{arg\,min~}
+\DeclareMathOperator*{\argsup}{arg\,sup~}
+\DeclareMathOperator*{\arginf}{arg\,inf~}
+\DeclareMathOperator*{\convolution}{\text{\Huge{$\ast$}}}
+\newcommand{\infconv}[2]{\convolution^\infty_{#1 = 1} #2}
+%true functions
+
+%%%% GENERAL SHORTCUTS
+
+%shortcuts for pure typesetting conveniences
+\newcommand{\qu}[1]{``{#1}''}
+\newcommand{\bv}[1]{\boldsymbol{#1}}
+
+\newcommand{\brho}{\boldsymbol{\rho}}
+\newcommand{\rcontrol}{\tilde{r}}
+%shortcuts for compound constants
+\newcommand{\BetaDistrConst}{\dfrac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)}}
+\newcommand{\NormDistrConst}{\dfrac{1}{\sqrt{2\pi\sigma^2}}}
+
+%shortcuts for conventional symbols
+\newcommand{\tsq}{\tau^2}
+\newcommand{\tsqh}{\hat{\tau}^2}
+\newcommand{\sigsq}{\sigma^2}
+\newcommand{\sigsqe}{\sigma^2_e}
+\newcommand{\sigsqsq}{\parens{\sigma^2}^2}
+\newcommand{\sigsqzsq}{\parens{\sigma_z^2}^2}
+\newcommand{\sigsqovern}{\dfrac{\sigsq}{n}}
+\newcommand{\tausq}{\tau^2}
+\newcommand{\tausqalpha}{\tau^2_\alpha}
+\newcommand{\tausqbeta}{\tau^2_\beta}
+\newcommand{\tausqsigma}{\tau^2_\sigma}
+\newcommand{\betasq}{\beta^2}
+\newcommand{\sigsqvec}{\bv{\sigma}^2}
+\newcommand{\sigsqhat}{\hat{\sigma}^2}
+\newcommand{\sigsqhatmlebayes}{\sigsqhat_{\text{Bayes, MLE}}}
+\newcommand{\sigsqhatmle}[1]{\sigsqhat_{#1, \text{MLE}}}
+\newcommand{\bSigma}{\bv{\Sigma}}
+\newcommand{\bSigmas}{\bv{\Sigma}_{S}}
+\newcommand{\bSigmaw}{\bv{\Sigma}_{W}}
+\newcommand{\bSigmawS}{\bv{\Sigma}_{W_S}}
+\newcommand{\bSigmawStilde}{\bv{\tilde{\Sigma}}_{W_S}}
+\newcommand{\bSigmaws}{\bv{\Sigma}_{W_s}}
+\newcommand{\bSigmaZ}{\bv{\rho}}
+\newcommand{\bSigmaZS}{\bSigmaZ_{\S}}
+\newcommand{\bSigmaZtilde}{\bv{\tilde{\rho}}}
+\newcommand{\bSigmaZST}{\bv{\Sigma}_{Z_{\S_T}}}
+\newcommand{\bSigmaZSC}{\bv{\Sigma}_{Z_{\S_C}}}
+\newcommand{\bSigmaZT}{\bv{\Sigma}_{Z_T}}
+\newcommand{\bSigmaZC}{\bv{\Sigma}_{Z_C}}
+
+\newcommand{\bkappaZST}{\bv{\kappa}_{Z_{\S_T}}}
+\newcommand{\bkappaZSC}{\bv{\kappa}_{Z_{\S_C}}}
+\newcommand{\bkappaZT}{\bv{\kappa}_{Z_T}}
+\newcommand{\bkappaZC}{\bv{\kappa}_{Z_C}}
+
+\newcommand{\sigmawij}[2]{\sigma_{#1\,,#2}}
+\newcommand{\sigmazi}[1]{\rho_{#1}}
+\newcommand{\sigmazTi}[1]{\rho_{T,#1}}
+\newcommand{\sigmazCi}[1]{\rho_{C,#1}}
+\newcommand{\bsigmazTvec}{\bv{\rho}_{T}}
+\newcommand{\bsigmazCvec}{\bv{\rho}_{C}}
+\newcommand{\gammaZ}{\bv{\gamma}_Z}
+
+\newcommand{\gammaZS}{\bv{\gamma}_{Z_{\S}}}
+\newcommand{\gammaZStilde}{\bv{\tilde{\gamma}}_{Z_{\S}}}
+\newcommand{\gammaZT}{\bv{\gamma}_{Z_T}}
+\newcommand{\gammaZC}{\bv{\gamma}_{Z_C}}
+
+\newcommand{\kappaZS}{\bv{\kappa}_{Z_{\S}}}
+\newcommand{\kappaZStilde}{\bv{\tilde{\kappa}}_{Z_{\S}}}
+
+\newcommand{\bSigmawhat}{\hat{\bv{\Sigma}}_{W}}
+\newcommand{\bSigmawcond}[1]{\bv{\Sigma}_{W |#1}}
+\newcommand{\bSigmainv}{\bSigma^{-1}}
+\newcommand{\thetavec}{\bv{\theta}}
+\newcommand{\thetahat}{\hat{\theta}}
+\newcommand{\betaT}{\beta_T}
+
+\newcommand{\curlyV}{\mathcal{V}}
+
+\newcommand{\POW}{\mathcal{P}}
+
+\newcommand{\betaThat}{\hat{\beta}}
+\newcommand{\betaThatexp}{\hat{\beta}_{\text{run}}}
+\newcommand{\betaThatDiffMeans}{\hat{\beta}_T^{\text{DM}}}
+\newcommand{\betaThatDiffMeanssq}{\hat{\beta}_T^{{\text{DM}^2}}}
+\newcommand{\betaThatLinRegr}{\hat{\beta}_T^{\text{LR}}}
+\newcommand{\thetahatmle}{\hat{\theta}_{\mathrm{MLE}}}
+\newcommand{\thetavechatmle}{\hat{\thetavec}_{\mathrm{MLE}}}
+\newcommand{\muhat}{\hat{\mu}}
+\newcommand{\musq}{\mu^2}
+\newcommand{\muvec}{\bv{\mu}}
+\newcommand{\muhatmle}{\muhat_{\text{MLE}}}
+\newcommand{\lambdahat}{\hat{\lambda}}
+\newcommand{\lambdahatmle}{\lambdahat_{\text{MLE}}}
+\newcommand{\etavec}{\bv{\eta}}
+\newcommand{\alphavec}{\bv{\alpha}}
+\newcommand{\minimaxdec}{\delta^*_{\mathrm{mm}}}
+\newcommand{\ybar}{\bar{y}}
+\newcommand{\Ybar}{\bar{Y}}
+\newcommand{\YbarT}{\Ybar_T}
+\newcommand{\YbarC}{\Ybar_C}
+\newcommand{\ybarT}{\ybar_T}
+\newcommand{\ybarC}{\ybar_C}
+\newcommand{\xbar}{\bar{x}}
+\newcommand{\Xbar}{\bar{X}}
+\newcommand{\XbarT}{\bar{\X}_T}
+\newcommand{\XbarC}{\bar{\X}_C}
+\newcommand{\zbar}{\bar{z}}
+\newcommand{\Phat}{\hat{P}}
+
+\newcommand{\allocspace}{\mathbb{W}}
+\newcommand{\allocspaceR}{{\allocspace}_{2R}}
+\newcommand{\allocspacebase}{\allocspace_{\text{base}}}
+\newcommand{\iid}{~{\buildrel iid \over \sim}~}
+\newcommand{\inddist}{~{\buildrel ind \over \sim}~}
+\newcommand{\approxdist}{~{\buildrel approx \over \sim}~}
+\newcommand{\equalsindist}{~{\buildrel d \over =}~}
+\newcommand{\setequals}{~{\buildrel \mathrm{set} \over =}~}
+\newcommand{\loglik}[1]{\mathcal{L}\parens{#1}}
+\newcommand{\Op}[1]{\mathcal{O}_p\parens{#1}}
+\newcommand{\thetahatkminone}{\thetahat^{(k-1)}}
+\newcommand{\thetahatkplusone}{\thetahat^{(k+1)}}
+\newcommand{\thetahatk}{\thetahat^{(k)}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\third}{\frac{1}{3}}
+\newcommand{\twothirds}{\frac{2}{3}}
+\newcommand{\fourth}{\frac{1}{4}}
+\newcommand{\fifth}{\frac{1}{5}}
+\newcommand{\sixth}{\frac{1}{6}}
+\newcommand{\tenth}{\frac{1}{10}}
+
+%shortcuts for vector and matrix notation
+\newcommand{\A}{\bv{A}}
+\newcommand{\At}{\A^T}
+\newcommand{\Ainv}{\inverse{\A}}
+\newcommand{\B}{\bv{B}}
+\newcommand{\D}{\bv{D}}
+\newcommand{\DX}{\D_{\X}}
+\newcommand{\G}{\bv{G}}
+\newcommand{\K}{\bv{K}}
+\newcommand{\Kt}{\K^T}
+\newcommand{\Kinv}{\inverse{K}}
+\newcommand{\Kinvt}{(\Kinv)^T}
+\newcommand{\M}{\bv{M}}
+\newcommand{\m}{\bv{m}}
+\newcommand{\Bt}{\B^T}
+\newcommand{\Q}{\bv{Q}}
+\newcommand{\Qt}{\Q^T}
+\newcommand{\U}{\bv{U}}
+\newcommand{\R}{\bv{R}}
+\renewcommand{\r}{\bv{r}}
+\newcommand{\Rt}{\R^T}
+\newcommand{\Z}{\bv{Z}}
+\newcommand{\X}{\bv{X}}
+\newcommand{\V}{\bv{V}}
+\newcommand{\Xtilde}{\tilde{\X}}
+\newcommand{\bxi}{\bv{\xi}}
+\newcommand{\p}{\bv{p}}
+\renewcommand{\S}{\bv{S}}
+\newcommand{\Sinv}{\S^{-1}}
+\newcommand{\Xsub}{\X_{\text{(sub)}}}
+\newcommand{\Xsubadj}{\X_{\text{(sub,adj)}}}
+\newcommand{\I}{\bv{I}}
+\newcommand{\J}{\bv{J}}
+\newcommand{\Y}{\bv{Y}}
+\newcommand{\W}{\bv{W}}
+\newcommand{\sigsqI}{\sigsq\I}
+\renewcommand{\P}{\bv{P}}
+\newcommand{\Psub}{\P_{\text{(sub)}}}
+\newcommand{\Pt}{\P^T}
+\newcommand{\Pii}{P_{ii}}
+\newcommand{\Pij}{P_{ij}}
+\newcommand{\IminP}{(\I-\P)}
+\newcommand{\Xt}{\bv{X}^T}
+\newcommand{\Xtildet}{\Xtilde^T}
+\newcommand{\XtX}{\Xt\X}
+\newcommand{\XtXinv}{\parens{\Xt\X}^{-1}}
+\newcommand{\XtXminussqrt}{\parens{\Xt\X}^{-\half}}
+\newcommand{\XtXinvXt}{\XtXinv\Xt}
+\newcommand{\XXtXinvXt}{\X\XtXinvXt}
+
+\newcommand{\XtXinvtilde}{\parens{\Xtildet\Xtilde}^{-1}}
+\newcommand{\XtXinvXttilde}{\XtXinvtilde\Xtildet}
+\newcommand{\XXtXinvXttilde}{\Xtilde\XtXinvXttilde}
+
+\newcommand{\BXprime}{\B_{\X}'}
+\newcommand{\BXprimet}{\BXprime^\top}
+
+\newcommand{\x}{\bv{x}}
+\newcommand{\f}{\bv{f}}
+\newcommand{\w}{\bv{w}}
+\newcommand{\wexp}{\w_{\text{run}}}
+\newcommand{\yexp}{\y_{\text{run}}}
+
+\newcommand{\tauhat}{\hat{\tau}}
+
+
+\newcommand{\quantile}[2]{\text{Quantile}\bracks{#1, #2}}
+\newcommand{\onevec}{\bv{1}}
+\newcommand{\zerovec}{\bv{0}}
+\newcommand{\oneton}{1, \ldots, n}
+\newcommand{\yoneton}{y_1, \ldots, y_n}
+\newcommand{\yonetonorder}{y_{(1)}, \ldots, y_{(n)}}
+\newcommand{\Yoneton}{Y_1, \ldots, Y_n}
+\newcommand{\iinoneton}{i \in \braces{\oneton}}
+\newcommand{\onetom}{1, \ldots, m}
+\newcommand{\jinonetom}{j \in \braces{\onetom}}
+\newcommand{\xoneton}{x_1, \ldots, x_n}
+\newcommand{\Xoneton}{X_1, \ldots, X_n}
+\newcommand{\xt}{\x^T}
+\newcommand{\y}{\bv{y}}
+\newcommand{\yt}{\y^T}
+\renewcommand{\c}{\bv{c}}
+\newcommand{\ct}{\c^T}
+\newcommand{\tstar}{\bv{t}^*}
+\renewcommand{\d}{\bv{d}}
+\renewcommand{\u}{\bv{u}}
+\renewcommand{\v}{\bv{v}}
+\renewcommand{\muvec}{\bv{\mu}}
+\renewcommand{\b}{\bv{b}}
+\renewcommand{\a}{\bv{a}}
+\newcommand{\s}{\bv{s}}
+\newcommand{\yadj}{\y_{\text{(adj)}}}
+\newcommand{\xjadj}{\x_{j\text{(adj)}}}
+\newcommand{\xjadjM}{\x_{j \perp M}}
+\newcommand{\yhat}{\hat{y}}
+\newcommand{\yhatsub}{\yhat_{\text{(sub)}}}
+\newcommand{\yhatstar}{\yhat^*}
+\newcommand{\yhatstarnew}{\yhatstar_{\text{new}}}
+\newcommand{\z}{\bv{z}}
+\newcommand{\zt}{\z^T}
+\newcommand{\bb}{\bv{b}}
+\newcommand{\bbt}{\bb^T}
+\newcommand{\bbeta}{\bv{\beta}}
+\newcommand{\beps}{\bv{\epsilon}}
+\newcommand{\bepst}{\beps^T}
+\newcommand{\e}{\bv{e}}
+\newcommand{\Mofy}{\M(\y)}
+\newcommand{\KofAlpha}{K(\alpha)}
+\newcommand{\ellset}{\mathcal{L}}
+\newcommand{\oneminalph}{1-\alpha}
+\newcommand{\SSE}{\text{SSE}}
+\newcommand{\SSEsub}{\text{SSE}_{\text{(sub)}}}
+\newcommand{\MSE}{\text{MSE}}
+\newcommand{\RMSE}{\text{RMSE}}
+\newcommand{\SSR}{\text{SSR}}
+\newcommand{\SST}{\text{SST}}
+\newcommand{\JSest}{\delta_{\text{JS}}(\x)}
+\newcommand{\Bayesest}{\delta_{\text{Bayes}}(\x)}
+\newcommand{\EmpBayesest}{\delta_{\text{EmpBayes}}(\x)}
+\newcommand{\BLUPest}{\delta_{\text{BLUP}}}
+\newcommand{\MLEest}[1]{\hat{#1}_{\text{MLE}}}
+
+%shortcuts for Linear Algebra stuff (i.e. vectors and matrices)
+\newcommand{\twovec}[2]{\bracks{\begin{array}{c} #1 \\ #2 \end{array}}}
+\newcommand{\threevec}[3]{\bracks{\begin{array}{c} #1 \\ #2 \\ #3 \end{array}}}
+\newcommand{\fivevec}[5]{\bracks{\begin{array}{c} #1 \\ #2 \\ #3 \\ #4 \\ #5 \end{array}}}
+\newcommand{\twobytwomat}[4]{\bracks{\begin{array}{cc} #1 & #2 \\ #3 & #4 \end{array}}}
+\newcommand{\threebytwomat}[6]{\bracks{\begin{array}{cc} #1 & #2 \\ #3 & #4 \\ #5 & #6 \end{array}}}
+
+%shortcuts for conventional compound symbols
+\newcommand{\thetainthetas}{\theta \in \Theta}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\complexes}{\mathbb{C}}
+\newcommand{\rationals}{\mathbb{Q}}
+\newcommand{\integers}{\mathbb{Z}}
+\newcommand{\naturals}{\mathbb{N}}
+\newcommand{\forallninN}{~~\forall n \in \naturals}
+\newcommand{\forallxinN}[1]{~~\forall #1 \in \reals}
+\newcommand{\matrixdims}[2]{\in \reals^{\,#1 \times #2}}
+\newcommand{\inRn}[1]{\in \reals^{\,#1}}
+\newcommand{\mathimplies}{\quad\Rightarrow\quad}
+\newcommand{\mathlogicequiv}{\quad\Leftrightarrow\quad}
+\newcommand{\eqncomment}[1]{\quad \text{(#1)}}
+\newcommand{\limitn}{\lim_{n \rightarrow \infty}}
+\newcommand{\limitN}{\lim_{N \rightarrow \infty}}
+\newcommand{\limitR}{\lim_{R \rightarrow \infty}}
+\newcommand{\limitd}{\lim_{d \rightarrow \infty}}
+\newcommand{\limitt}{\lim_{t \rightarrow \infty}}
+\newcommand{\limitsupn}{\limsup_{n \rightarrow \infty}~}
+\newcommand{\limitinfn}{\liminf_{n \rightarrow \infty}~}
+\newcommand{\limitk}{\lim_{k \rightarrow \infty}}
+\newcommand{\limsupn}{\limsup_{n \rightarrow \infty}}
+\newcommand{\limsupk}{\limsup_{k \rightarrow \infty}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+
+%shortcuts for environments
+\newcommand{\beqn}{\vspace{-0.25cm}\begin{eqnarray*}}
+\newcommand{\eeqn}{\end{eqnarray*}}
+\newcommand{\bneqn}{\vspace{-0.25cm}\begin{eqnarray}}
+\newcommand{\eneqn}{\end{eqnarray}}
+\newcommand{\benum}{\begin{enumerate}}
+\newcommand{\eenum}{\end{enumerate}}
+
+%shortcuts for mini environments
+\newcommand{\parens}[1]{\left(#1\right)}
+\newcommand{\squared}[1]{\parens{#1}^2}
+\newcommand{\angbrace}[1]{\left<#1\right>}
+\newcommand{\tothepow}[2]{\parens{#1}^{#2}}
+\newcommand{\prob}[1]{\mathbb{P}\parens{#1}}
+\newcommand{\probsub}[2]{\mathbb{P}_{#1}\parens{#2}}
+\newcommand{\cprob}[2]{\prob{#1~|~#2}}
+\newcommand{\littleo}[1]{o\parens{#1}}
+\newcommand{\bigo}[1]{O\parens{#1}}
+\newcommand{\Lp}[1]{\mathbb{L}^{#1}}
+\renewcommand{\arcsin}[1]{\text{arcsin}\parens{#1}}
+\newcommand{\prodonen}[2]{\bracks{\prod_{#1=1}^n #2}}
+\newcommand{\mysum}[4]{\sum_{#1=#2}^{#3} #4}
+\newcommand{\sumonen}[2]{\sum_{#1=1}^n #2}
+\newcommand{\infsum}[2]{\sum_{#1=1}^\infty #2}
+\newcommand{\infprod}[2]{\prod_{#1=1}^\infty #2}
+\newcommand{\infunion}[2]{\bigcup_{#1=1}^\infty #2}
+\newcommand{\infinter}[2]{\bigcap_{#1=1}^\infty #2}
+\newcommand{\infintegral}[2]{\int^\infty_{-\infty} #2 ~\text{d}#1}
+\newcommand{\supthetas}[1]{\sup_{\thetainthetas}\braces{#1}}
+\newcommand{\bracks}[1]{\left[#1\right]}
+\newcommand{\braces}[1]{\left\{#1\right\}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\abss}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+\newcommand{\normsq}[1]{\norm{#1}^2}
+\newcommand{\normfourth}[1]{\norm{#1}^4}
+\newcommand{\frob}[1]{\norm{#1}_F}
+\newcommand{\frobsq}[1]{\normsq{#1}_F}
+\newcommand{\inverse}[1]{\parens{#1}^{-1}}
+\newcommand{\rowof}[2]{\parens{#1}_{#2\cdot}}
+
+%shortcuts for functionals
+\newcommand{\diag}[1]{\text{diag}\bracks{#1}}
+\newcommand{\realcomp}[1]{\text{Re}\bracks{#1}}
+\newcommand{\imagcomp}[1]{\text{Im}\bracks{#1}}
+\newcommand{\range}[1]{\text{range}\bracks{#1}}
+\newcommand{\colsp}[1]{\text{colsp}\bracks{#1}}
+\newcommand{\colspnostr}[1]{\text{colsp}[#1]}
+\newcommand{\rowsp}[1]{\text{rowsp}\bracks{#1}}
+\newcommand{\tr}[1]{\text{tr}\bracks{#1}}
+\newcommand{\rank}[1]{\text{rank}\bracks{#1}}
+\newcommand{\proj}[2]{\text{Proj}_{#1}\bracks{#2}}
+\newcommand{\projcolspX}[1]{\text{Proj}_{\colsp{\X}}\bracks{#1}}
+\newcommand{\median}[1]{\text{median}\bracks{#1}}
+\newcommand{\mean}[1]{\text{mean}\bracks{#1}}
+\newcommand{\dime}[1]{\text{dim}\bracks{#1}}
+\renewcommand{\det}[1]{\text{det}\bracks{#1}}
+\newcommand{\expe}[1]{\mathbb{E}\bracks{#1}}
+\newcommand{\cexpenostr}[2]{\mathbb{E}[#1\,|\,#2]}
+\newcommand{\cexpe}[2]{\expe{#1\,|\,#2}}
+\newcommand{\expesub}[2]{\mathbb{E}_{\,#1}\bracks{#2}}
+\newcommand{\cexpesub}[3]{\expesub{#1}{#2\,|\,#3}}
+\newcommand{\cexpesubnostr}[3]{\mathbb{E}_{\,#1}[#2\,|\,#3]}
+\newcommand{\cbiassubnostr}[3]{\text{Bias}_{\,#1}[#2\,|\,#3]}
+\newcommand{\cvar}[2]{\var{#1\,|\,#2}}
+\newcommand{\cvarnostr}[2]{\varnostr{#1\,|\,#2}}
+\newcommand{\cvarsubnostr}[3]{\mathbb{V}\text{ar}_{#1}[#2\,|\,#3]}
+\newcommand{\expeabs}[1]{\expe{\abss{#1}}}
+\newcommand{\expesubnostr}[2]{\mathbb{E}_{\,#1}[#2]}
+\newcommand{\indic}[1]{\mathds{1}_{#1}}
+\newcommand{\var}[1]{\mathbb{V}\text{ar}\bracks{#1}}
+\newcommand{\mse}[1]{\mathbb{M}\text{SE}\bracks{#1}}
+\newcommand{\varsub}[2]{\mathbb{V}\text{ar}_{#1}\bracks{#2}}
+\newcommand{\cvarsub}[3]{\mathbb{V}\text{ar}_{#1}\bracks{#2\,|\,#3}}
+\newcommand{\covsub}[3]{\mathbb{C}\text{ov}_{#1}\bracks{#2,\,#3}}
+\newcommand{\varnostr}[1]{\mathbb{V}\text{ar}[#1]}
+\newcommand{\varnostrsub}[2]{\mathbb{V}\text{ar}_{#1}[#2]}
+\newcommand{\msenostrsub}[2]{\mathbb{M}\text{SE}_{#1}[#2]}
+\newcommand{\cmse}[2]{\mathbb{M}\text{SE}\bracks{#1\,|\,#2}}
+\newcommand{\msesub}[2]{\mathbb{M}\text{SE}_{#1}\bracks{#2}}
+\newcommand{\cmsesub}[3]{\mathbb{M}\text{SE}_{#1}\bracks{#2\,|\,#3}}
+\newcommand{\cmsesubnostr}[3]{\mathbb{M}\text{SE}_{#1}[#2\,|\,#3]}
+
+\newcommand{\expenostr}[1]{\mathbb{E}[#1]}
+\newcommand{\expenostrsub}[2]{\mathbb{E}_{#1}[#2]}
+\newcommand{\sd}[1]{\mathbb{S}\text{D}\bracks{#1}}
+\newcommand{\cov}[2]{\mathbb{C}\text{ov}\bracks{#1,\,#2}}
+\newcommand{\corr}[2]{\text{Corr}\bracks{#1, #2}}
+\newcommand{\se}[1]{\mathbb{S}\text{E}\bracks{#1}}
+\newcommand{\sesub}[2]{\mathbb{S}\text{E}_{#1}\bracks{#2}}
+\newcommand{\sesubnostr}[2]{\text{SE}_{#1}[#2]}
+\newcommand{\seest}[1]{\hat{\text{SE}}\bracks{#1}}
+\newcommand{\bias}[1]{\text{Bias}\bracks{#1}}
+\newcommand{\biassub}[2]{\text{Bias}_{#1}\bracks{#2}}
+\newcommand{\biasnostr}[1]{\text{Bias}[#1]}
+\newcommand{\partialop}[2]{\dfrac{\partial #1}{\partial #2}}
+\newcommand{\secpartialop}[2]{\dfrac{\partial^2}{\partial #1^2}\bracks{#2}}
+\newcommand{\mixpartialop}[3]{\dfrac{\partial^2}{\partial #1 \partial #2}\bracks{#3}}
+
+%shortcuts for functions
+\renewcommand{\exp}[1]{\mathrm{exp}\parens{#1}}
+\newcommand{\expnostr}[1]{\mathrm{exp}(#1)}
+\renewcommand{\cos}[1]{\text{cos}\parens{#1}}
+\renewcommand{\sin}[1]{\text{sin}\parens{#1}}
+\newcommand{\sign}[1]{\text{sign}\parens{#1}}
+\newcommand{\are}[1]{\mathrm{ARE}\parens{#1}}
+\newcommand{\natlog}[1]{\ln\parens{#1}}
+\newcommand{\lgamma}[1]{\text{ln}\Gammaf{#1}}
+\newcommand{\oneover}[1]{\frac{1}{#1}}
+\newcommand{\overtwo}[1]{\frac{#1}{2}}
+\newcommand{\overn}[1]{\frac{#1}{n}}
+\newcommand{\oneoversqrt}[1]{\oneover{\sqrt{#1}}}
+\newcommand{\sqd}[1]{\parens{#1}^2}
+\newcommand{\loss}[1]{\ell\parens{\theta, #1}}
+\newcommand{\losstwo}[2]{\ell\parens{#1, #2}}
+\newcommand{\cf}{\phi(t)}
+
+%English language specific shortcuts
+\newcommand{\ie}{\textit{i.e.} }
+\newcommand{\AKA}{\textit{AKA} }
+\renewcommand{\iff}{\textit{iff}}
+\newcommand{\eg}{\textit{e.g.} }
+\newcommand{\st}{\textit{s.t.} }
+\newcommand{\wrt}{\textit{w.r.t.} }
+\newcommand{\mathst}{~~\text{\st}~~}
+\newcommand{\mathand}{~~\text{and}~~}
+\newcommand{\mathor}{~~\text{or}~~}
+\newcommand{\ala}{\textit{a la} }
+\newcommand{\ppp}{posterior predictive p-value}
+\newcommand{\dd}{dataset-to-dataset}
+
+
+%shortcuts for distribution titles
+\newcommand{\logistic}[2]{\mathrm{Logistic}\parens{#1,\,#2}}
+\newcommand{\bernoulli}[1]{\mathrm{Bernoulli}\parens{#1}}
+\newcommand{\betanot}[2]{\mathrm{Beta}\parens{#1,\,#2}}
+\newcommand{\stdbetanot}{\betanot{\alpha}{\beta}}
+\newcommand{\multnormnot}[3]{\mathcal{N}_{#1}\parens{#2,\,#3}}
+\newcommand{\invw}[2]{\mathrm{InvW}\parens{#1,\,#2}}
+\newcommand{\normnot}[2]{\mathcal{N}\parens{#1,\,#2}}
+\newcommand{\classicnormnot}{\normnot{\mu}{\sigsq}}
+\newcommand{\stdnormnot}{\normnot{0}{1}}
+\newcommand{\uniform}[2]{\mathrm{U}\parens{#1,\,#2}}
+\newcommand{\stduniform}{\uniform{0}{1}}
+\newcommand{\exponential}[1]{\mathrm{Exp}\parens{#1}}
+\newcommand{\gammadist}[2]{\mathrm{Gamma}\parens{#1, #2}}
+\newcommand{\poisson}[1]{\mathrm{Poisson}\parens{#1}}
+\newcommand{\binomial}[2]{\mathrm{Binomial}\parens{#1,\,#2}}
+\newcommand{\hyper}[3]{\mathrm{Hypergeometric}\parens{#1,\,#2,\,#3}}
+\newcommand{\rayleigh}[1]{\mathrm{Rayleigh}\parens{#1}}
+\newcommand{\multinomial}[2]{\mathrm{Multinomial}\parens{#1,\,#2}}
+\newcommand{\gammanot}[2]{\mathrm{Gamma}\parens{#1,\,#2}}
+\newcommand{\weibullnot}[2]{\mathrm{Weibull}\parens{#1,\,#2}}
+\newcommand{\cauchynot}[2]{\text{Cauchy}\parens{#1,\,#2}}
+\newcommand{\invchisqnot}[1]{\text{Inv}\chisq{#1}}
+\newcommand{\invscaledchisqnot}[2]{\text{ScaledInv}\ncchisq{#1}{#2}}
+\newcommand{\invgammanot}[2]{\text{InvGamma}\parens{#1,\,#2}}
+\newcommand{\chisq}[1]{\chi^2_{#1}}
+\newcommand{\mult}[1]{\text{Mult}\bracks{#1}}
+\newcommand{\ncchisq}[2]{\chi^{`2}\parens{#1,\,#2}}
+\newcommand{\ncF}[3]{F_{#1,#2}\parens{#3}}
+
+%shortcuts for PDF's of common distributions
+\newcommand{\logisticpdf}[3]{\oneover{#3}\dfrac{\exp{-\dfrac{#1 - #2}{#3}}}{\parens{1+\exp{-\dfrac{#1 - #2}{#3}}}^2}}
+\newcommand{\betapdf}[3]{\dfrac{\Gamma(#2 + #3)}{\Gamma(#2)\Gamma(#3)}#1^{#2-1} (1-#1)^{#3-1}}
+\newcommand{\normpdf}[3]{\frac{1}{\sqrt{2\pi#3}}\exp{-\frac{1}{2#3}(#1 - #2)^2}}
+\newcommand{\normpdfvarone}[2]{\dfrac{1}{\sqrt{2\pi}}e^{-\half(#1 - #2)^2}}
+\newcommand{\chisqpdf}[2]{\dfrac{1}{2^{#2/2}\Gamma(#2/2)}\; {#1}^{#2/2-1} e^{-#1/2}}
+\newcommand{\invchisqpdf}[2]{\dfrac{2^{-\overtwo{#1}}}{\Gamma(#2/2)}\,{#1}^{-\overtwo{#2}-1}  e^{-\oneover{2 #1}}}
+\newcommand{\exponentialpdf}[2]{#2\exp{-#2#1}}
+\newcommand{\poissonpdf}[2]{\dfrac{e^{-#1} #1^{#2}}{#2!}}
+\newcommand{\binomialpdf}[3]{\binom{#2}{#1}#3^{#1}(1-#3)^{#2-#1}}
+\newcommand{\rayleighpdf}[2]{\dfrac{#1}{#2^2}\exp{-\dfrac{#1^2}{2 #2^2}}}
+\newcommand{\gammapdf}[3]{\dfrac{#3^#2}{\Gamma\parens{#2}}#1^{#2-1}\exp{-#3 #1}}
+\newcommand{\cauchypdf}[3]{\oneover{\pi} \dfrac{#3}{\parens{#1-#2}^2 + #3^2}}
+\newcommand{\Gammaf}[1]{\Gamma\parens{#1}}
+
+%shortcuts for miscellaneous typesetting conveniences
+\newcommand{\notesref}[1]{\marginpar{\color{gray}\tt #1\color{black}}}
+
+%%%% DOMAIN-SPECIFIC SHORTCUTS
+
+%Real analysis related shortcuts
+\newcommand{\zeroonecl}{\bracks{0,1}}
+\newcommand{\forallepsgrzero}{\forall \epsilon > 0~~}
+\newcommand{\lessthaneps}{< \epsilon}
+\newcommand{\fraccomp}[1]{\text{frac}\bracks{#1}}
+
+%Bayesian related shortcuts
+\newcommand{\yrep}{y^{\text{rep}}}
+\newcommand{\yrepisq}{(\yrep_i)^2}
+\newcommand{\yrepvec}{\bv{y}^{\text{rep}}}
+
+
+%Probability shortcuts
+\newcommand{\SigField}{\mathcal{F}}
+\newcommand{\ProbMap}{\mathcal{P}}
+\newcommand{\probtrinity}{\parens{\Omega, \SigField, \ProbMap}}
+\newcommand{\convp}{~{\buildrel p \over \longrightarrow}~}
+
+\newcommand{\tendn}{\stackrel{n \to \infty}{\longrightarrow}}
+\newcommand{\tendt}{\stackrel{t \to \infty}{\longrightarrow}}
+
+\newcommand{\convLp}[1]{~{\buildrel \Lp{#1} \over \rightarrow}~}
+\newcommand{\nconvp}{~{\buildrel p \over \nrightarrow}~}
+\newcommand{\convae}{~{\buildrel a.e. \over \longrightarrow}~}
+\newcommand{\convas}{~{\buildrel a.s. \over \longrightarrow}~}
+\newcommand{\convau}{~{\buildrel a.u. \over \longrightarrow}~}
+\newcommand{\nconvau}{~{\buildrel a.u. \over \nrightarrow}~}
+\newcommand{\nconvae}{~{\buildrel a.e. \over \nrightarrow}~}
+\newcommand{\convd}{~{\buildrel \mathcal{D} \over \longrightarrow}~}
+\newcommand{\nconvd}{~{\buildrel \mathcal{D} \over \longnrightarrow}~}
+\newcommand{\withprob}{~~\text{w.p.}~~}
+\newcommand{\io}{~~\text{i.o.}}
+
+\newcommand{\Acl}{\bar{A}}
+\newcommand{\ENcl}{\bar{E}_N}
+\newcommand{\diam}[1]{\text{diam}\parens{#1}}
+
+\newcommand{\taua}{\tau_a}
+
+\newcommand{\myint}[4]{\int_{#2}^{#3} #4 \,\text{d}#1}
+\newcommand{\laplacet}[1]{\mathscr{L}\bracks{#1}}
+\newcommand{\laplaceinvt}[1]{\mathscr{L}^{-1}\bracks{#1}}
+\newcommand{\mymin}[1]{\text{min}\braces{#1}}
+
+\newcommand{\Vbar}[1]{\bar{V}\parens{#1}}
+\newcommand{\expnegrtau}{\exp{-r\tau}}
+
+%%% problem typesetting
+\newcommand{\problem}{\vspace{0.2cm} \noindent {\large{\textsf{Problem \arabic{probnum}~}}} \addtocounter{probnum}{1}}
+%\newcommand{\easyproblem}{\ingreen{\noindent \textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+%\newcommand{\intermediateproblem}{\noindent \inyellow{\textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+%\newcommand{\hardproblem}{\inred{\noindent \textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+%\newcommand{\extracreditproblem}{\noindent \inpurple{\textsf{Problem \arabic{probnum}~}} \addtocounter{probnum}{1}}
+
+\newcommand{\easysubproblem}{\ingreen{\item}}
+\newcommand{\intermediatesubproblem}{\inyellow{\item}}
+\newcommand{\hardsubproblem}{\inred{\item}}
+\newcommand{\extracreditsubproblem}{\inpurple{\item}}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+
+%%%others
+\newcommand{\sddist}{\mathbb{S}}
+\newcommand{\pval}{p_{\text{val}}}
+\newcommand{\fpycs}{f_{\text{PYCS}}}
+\newcommand{\fpois}{f_{\text{Pois}}}
+\newcommand{\lik}[1]{\text{L}\parens{#1}}
+
+\newcommand{\setequalzero}{\buildrel \text{set} \over = 0}
+
+\newcommand{\errorrv}{\mathcal{E}}
+\newcommand{\berrorrv}{\bv{\errorrv}}
+\newcommand{\indicTi}{\indic{T,i}}
+\newcommand{\cexpesf}[1]{\cexpe{#1}{\SigField}}
+\newcommand{\cvarsf}[1]{\cvar{#1}{\SigField}}
+\newcommand{\cexpesfee}[1]{\cexpe{#1}{\SigField, \epsilon_i, \epsilon_j}}
+
+\newcommand{\nr}{n_{R}}
+\newcommand{\nrc}{n_{R,C}}
+\newcommand{\nrt}{n_{R,T}}
+\newcommand{\indicrti}{\indic{R,T,i}}
+\newcommand{\indicrtj}{\indic{R,T,j}}
+\newcommand{\Dbar}{\bar{D}}
+\newcommand{\SsqDbar}{S^2_{\Dbar}}
+\newcommand{\SsqR}{S^2_R}
+\newcommand{\YbarRT}{\Ybar_{R,T}}
+\newcommand{\YbarRC}{\Ybar_{R,C}}
+\newcommand{\YbarRTMinusYbarRC}{\YbarRT - \YbarRC}
+
+\newcommand{\dbar}{\bar{d}}
+\newcommand{\ssqDbar}{s^2_{\Dbar}}
+\newcommand{\ssqR}{s^2_R}
+\newcommand{\ybarRT}{\ybar_{R,T}}
+\newcommand{\ybarRC}{\ybar_{R,C}}
+\newcommand{\ybarRTMinusybarRC}{\ybarRT - \ybarRC}
+
+\newcommand{\xnew}{\x_{\text{new}}}
+\newcommand{\xold}{\x_{\text{old}}}
+\newcommand{\Xnew}{\X_{\text{new}}}
+\newcommand{\Xold}{\X_{\text{old}}}
+
+\newcommand{\sigsqR}{\sigsq_R}
+\newcommand{\sigsqDbar}{\sigsq_{\bar{D}}}
+\newcommand{\sigsqDeltaYbar}{\sigsq_{\Delta\Ybar}}
+\newcommand{\oneovernrtplusoneovernrc}{\oneover{\nrt} + \oneover{\nrc}}
+\newcommand{\parensoneovernrtplusoneovernrc}{\parens{\oneovernrtplusoneovernrc}}
+\newcommand{\sigsqBT}{\sigsq_{B_T}}
+\newcommand{\nrpooled}{n_{R,p}^{-1}} %%change later
+
+\newcommand{\Ymax}{Y_{\text{max}}}
+\newcommand{\Ymin}{Y_{\text{min}}}
+
+\newcommand{\Oof}[1]{O\parens{#1}}
+\newcommand{\Oofoneover}[1]{\Oof{\oneover{#1}}}
+
+\newcommand{\expesubwBsqx}{\expesub{\w}{B^2_x}}
+\newcommand{\expesubwBfourthx}{\expesub{\w}{B^4_x}}
+\newcommand{\imbal}{{\cal B}}
+\newcommand{\trPbSigmaw}{\imbal_x^2}
+\newcommand{\trPbSigmawsq}{\imbal_x^4}
+
+\newcommand{\expectedpower}{\expesub{\Z}{\POW}}
+
+\newcommand{\muvecSdiff}{\tilde{\muvec}_{\S}}
+\newcommand{\Wdotmus}{\W_{\S}^\top \muvecSsum}
+\newcommand{\ZSdiff}{\tilde{\Z}_{\S}}
+\newcommand{\muvecSsum}{\muvec_{\S}}
+\newcommand{\ZSsum}{\Z_{\S}}
+\newcommand{\ttau}{\tau_0}
+
+
+%%%%%%%%%%%%%%%%%% expansions for variance of the total MSE
+
+\newcommand{\onevecall}{\onevec_{2n}}
+\newcommand{\onevecallT}{\onevecall^\top}
+\newcommand{\onevecallall}{\onevec_{2N}}
+\newcommand{\onevecallallT}{\onevecallall^\top}
+\newcommand{\diagWS}{\diag{\W_{\S}}}
+\newcommand{\summusS}{\onevecallT \muvecSdiff}
+\newcommand{\summusSsq}{\squared{\summusS}}
+
+\newcommand{\tva}{\summusSsq}
+\newcommand{\tvb}{\squared{\onevecallT \ZSdiff}} 
+\newcommand{\tvc}{\squared{\Wdotmus}} 
+\newcommand{\tvd}{\squared{\W_{\S}^\top \ZSsum}} 
+\newcommand{\tve}{\ttau^2}
+\newcommand{\tvf}{2 \summusS \onevecallT \ZSdiff}
+\newcommand{\tvg}{2 \summusS \Wdotmus}
+\newcommand{\tvh}{2 \summusS \W_{\S}^\top \ZSsum} 
+\newcommand{\tvi}{-2\ttau \summusS}
+\newcommand{\tvj}{2 \onevecallT \ZSdiff \Wdotmus}
+\newcommand{\tvk}{2 \onevecallT \ZSdiff \W_{\S}^\top \ZSsum} 
+\newcommand{\tvl}{-2\ttau \onevecallT \ZSdiff}
+\newcommand{\tvm}{2 \Wdotmus \W_{\S}^\top \ZSsum} 
+\newcommand{\tvn}{-2 \ttau \Wdotmus}
+\newcommand{\tvo}{-2 \ttau \W_{\S}^\top \ZSsum}
+
+% \newcommand{\tva}{\summusSsq}
+% \newcommand{\tvb}{\squared{\onevecallT \ZSdiff}} 
+% \newcommand{\tvc}{\squared{\W_{\S}^\top \muvecSsum}} 
+% \newcommand{\tvd}{\squared{\W_{\S}^\top \ZSsum}} 
+% \newcommand{\tve}{\ttau^2}
+% \newcommand{\tvf}{2 \summusS \onevecallT \ZSdiff}
+% \newcommand{\tvg}{2 \summusS \W_{\S}^\top \muvecSsum}
+% \newcommand{\tvh}{2 \summusS \W_{\S}^\top \ZSsum} 
+% \newcommand{\tvi}{-2\ttau \summusS}
+% \newcommand{\tvj}{2 \onevecallT \ZSdiff \W_{\S}^\top \muvecSsum}
+% \newcommand{\tvk}{2 \onevecallT \ZSdiff \W_{\S}^\top \ZSsum} 
+% \newcommand{\tvl}{-2\ttau \onevecallT \ZSdiff}
+% \newcommand{\tvm}{2 \W_{\S}^\top \muvecSsum \W_{\S}^\top \ZSsum} 
+% \newcommand{\tvn}{-2 \ttau \W_{\S}^\top \muvecSsum}
+% \newcommand{\tvo}{-2 \ttau \W_{\S}^\top \ZSsum}
+
+\newcommand{\nBT}{n_{B_T}}
+\newcommand{\nBC}{n_{B_C}}
+\newcommand{\Iset}{\mathcal{I}}
+\newcommand{\LTOT}{\ell_{\text{TOT}}}
+\newcommand{\SigmaX}{\hat{\Sigma}_X}
