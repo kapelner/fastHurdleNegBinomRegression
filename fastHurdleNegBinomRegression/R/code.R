@@ -1,12 +1,3 @@
-assert_binary_vector_then_cast_to_numeric = function(vec){
-	checkmate::assert_choice(class(vec), c("numeric", "integer", "logical"))
-	vec = as.numeric(vec)
-	if (!(checkmate::testSetEqual(unique(vec), c(0, 1)) | checkmate::testSetEqual(unique(vec), c(0)) | checkmate::testSetEqual(unique(vec), c(1)))){ #binary only
-		stop("Set must consist of zeroes and/or ones.")
-	}
-	vec
-}
-
 assert_numeric_matrix = function(Xmm){
 	checkmate::assert_matrix(Xmm)
 	checkmate::assert_numeric(Xmm)
@@ -22,13 +13,20 @@ assert_numeric_matrix = function(Xmm){
 #' @param lm_fit_tol					When \code{drop_collinear_variables = TRUE}, this is the tolerance to detect collinearity among predictors.
 #' 										We use the default value from \code{base::lm.fit}'s which is 1e-7. If you fit the logistic regression and
 #' 										still get p-values near 1 indicating high collinearity, we recommend making this value smaller.
-#' @param initial_phi					Value of initial starting guess for the overdispersion parameter in the count model. Default is \code{10} which is large
-#' 										so the negative binomial is approximately acting as a Poisson model.
+#' @param eps_f   						From RcppNumerical. Iteration stops if \eqn{|f-f'|/|f|<\epsilon_f}{|f-f'|/|f|<eps_f},
+#'              						where \eqn{f} and \eqn{f'} are the current and previous value
+#'              						of the objective function (negative log likelihood) respectively.
+#' @param eps_g							From RcppNumerical. Iteration stops if
+#'              						\eqn{||g|| < \epsilon_g * \max(1, ||\beta||)}{||g|| < eps_g * max(1, ||beta||)},
+#'           						   	where \eqn{\beta}{beta} is the current coefficient vector and
+#'              						\eqn{g} is the gradient.
+#' @param maxit							From RcppNumerical. Maximum number of L-BFGS iterations.
 #' @param num_cores						Number of cores to use to speed up matrix multiplication and matrix inversion (used only during inference computation). Default is 1.
 #' 										Unless the number of variables, i.e. \code{ncol(Xmm)}, is large, there does not seem to be a performance gain in using multiple cores.
-#' @param ...   						Other arguments to be passed to \code{fastLR}. See documentation there.
+
 #'
 #' @return      A list of raw results
+#' @useDynLib 							fastHurdleNegBinomRegression, .registration=TRUE
 #' @export
 #' @examples
 #' library(MASS); data(Pima.te)
@@ -36,17 +34,22 @@ assert_numeric_matrix = function(Xmm){
 #' 	 Xmm = model.matrix(~ . - type, Pima.te), 
 #'   ybin = as.numeric(Pima.te$type == "Yes")
 #' )
-fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_tol = 1e-7, initial_phi = 10, num_cores = 1, ...){
+fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_tol = 1e-7, eps_f = 1e-8, eps_g = 1e-5, maxit = 300L, num_cores = 1){
 	assert_numeric_matrix(Xmm)
 	assert_vector(y)
-	assert_count(y)
+	for (y_i in y){
+		assert_count(y_i)
+	}	
 	assert_logical(drop_collinear_variables)
 	assert_numeric(lm_fit_tol,  lower = .Machine$double.eps)
-	assert_numeric(initial_phi, lower = .Machine$double.eps)
+	assert_numeric(eps_f,  		lower = .Machine$double.eps)
+	assert_numeric(eps_g, 		lower = .Machine$double.eps)
+	assert_integer(maxit)
+	assert_count(maxit, positive = TRUE)
 	assert_count(num_cores, positive = TRUE)
 	original_col_names = colnames(Xmm)
 	
-	p = ncol(Xmm) #the original p before variables are dropped
+	p = ncol(Xmm) #the original p before variables are potentially dropped
 	
 	if (length(y) != nrow(Xmm)){
 		stop("The number of rows in Xmm must be equal to the length of ybin")
@@ -87,9 +90,12 @@ fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_
 	
 	#now we get the initial starting vals
 	gammas_0 = fastLogisticRegressionWrap::fast_logistic_regression(Xmm, z)$coefficients
-	betas_0 = coef(lm.fit(Xmm_y_pos, log(y_pos - 1))) #the neg binomial model fits in log space
+	betas_0 = coef(lm.fit(Xmm_y_pos, log(y_pos))) #the neg binomial model fits in log space
+	#to get the best guess of the phi we use MM via the formula from https://mc-stan.org/docs/2_20/functions-reference/nbalt.html
+	mu_y_hat = mean(y_pos - 1)
+	initial_phi = mu_y_hat^2 / (var(y_pos - 1) - mu_y_hat)
 	
-	flr = fast_hnb_cpp(Xmm, y, z, c(gammas_0, betas_0, initial_phi), ...) 
+	flr = fast_hnb_cpp(Xmm, y, z, c(gammas_0, betas_0, initial_phi), eps_f, eps_g, maxit) 
 	flr$Xmm = Xmm
 	flr$y = y
 	flr$gammas_0 = gammas_0

@@ -37,7 +37,7 @@ public:
     	}
     	double phi = thetas[2 * p];
 
-    	Rcout << "  gammas " << gammas << " betas " << betas << " phi " << phi << endl;
+    	Rcout << "  gammas " << endl << gammas << " betas " << endl << betas << endl << " phi " << phi << endl;
 
     	//first calculate some useful values to cache
     	Eigen::VectorXd exp_etas(n);
@@ -54,6 +54,8 @@ public:
         	exp_xis[i] =     exp(xi_i);
         	exp_neg_xis[i] = exp(-xi_i);
     	}
+    	Rcout << "  exp_etas " << endl << exp_etas << " exp_neg_etas " << endl << exp_neg_etas << endl;
+    	Rcout << "  exp_xis "  << endl << exp_xis  << " exp_neg_xis "  << endl << exp_neg_xis  << endl;
 
     	//first add up the log likelihood
     	double loglik = 0;
@@ -71,6 +73,7 @@ public:
     		}
     	}
 
+    	Rcout << "  loglik " << loglik << endl;
     	//then compute all the 2 * p + 1 partial derivatives (i.e., the entries in the gradient)
     	for (int j = 0; j < (2 * p + 1); j++){ //initialize
     		grad[j] = 0;
@@ -99,6 +102,7 @@ public:
      		}
     	}
 
+    	Rcout << "  grad " << endl << grad << endl;
         return -loglik; //we must return the cost as the *negative* log likelihood as the algorithm *minimizes* cost (thus it will maximize likelihood)
     }
 };
@@ -109,31 +113,36 @@ public:
 Rcpp::List fast_hnb_cpp(
 		Rcpp::NumericMatrix X,
 		Rcpp::NumericVector y,
-		Rcpp::IntegerVector z,
-        Rcpp::NumericVector theta_start,
-        double eps_f,
+		Rcpp::NumericVector z,
+		Rcpp::NumericVector theta_start,
+		double eps_f,
 		double eps_g,
-		int maxit){
+		int maxit
+	){
 
-//    const MapMat XX = ;
-//    const MapVec yy = ;
-//    const MapVec zz = ;
+    const MapMat XX = Rcpp::as<MapMat>(X);
+    const MapVec yy = Rcpp::as<MapVec>(y);
+    const MapVec zz = Rcpp::as<MapVec>(z);
 
 	// Initial guess
 	Rcpp::NumericVector theta_hats = Rcpp::clone(theta_start);
 	MapVec thetas(theta_hats.begin(), theta_hats.length());
 
     // Negative log likelihood
-    HurdleNegativeBinomialRegression nll(Rcpp::as<MapMat>(X), Rcpp::as<MapVec>(y), Rcpp::as<MapVec>(z));
+    HurdleNegativeBinomialRegression nll(XX, yy, zz);
 
 	double negloglikelihood;
 	int status = optim_lbfgs(nll, thetas, negloglikelihood, maxit, eps_f, eps_g);
 	if (status < 0)
 		Rcpp::warning("algorithm did not converge");
 
+//	Rcpp::List return_list =
+//	if (do_inference){
+//
+//	}
 	return Rcpp::List::create(
-		Rcpp::Named("coefficients")      = theta_hats,
-		Rcpp::Named("loglikelihood")     = -negloglikelihood,
-		Rcpp::Named("converged")         = (status >= 0)
-	);
+			Rcpp::Named("coefficients")      = theta_hats,
+			Rcpp::Named("loglikelihood")     = -negloglikelihood,
+			Rcpp::Named("converged")         = (status >= 0)
+		);
 }

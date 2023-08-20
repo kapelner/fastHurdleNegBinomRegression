@@ -13,7 +13,6 @@ Kapelner, A
 \author{
 Adam Kapelner \email{kapelner@qc.cuny.edu}
 }
-\keyword{binomila}
-\keyword{inflated}
+\keyword{binomial}
+\keyword{hurdle}
 \keyword{negative}
-\keyword{zero}

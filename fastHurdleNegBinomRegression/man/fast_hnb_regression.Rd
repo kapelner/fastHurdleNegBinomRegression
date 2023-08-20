@@ -9,9 +9,10 @@ fast_hnb_regression(
   y,
   drop_collinear_variables = FALSE,
   lm_fit_tol = 1e-07,
-  initial_phi = 10,
-  num_cores = 1,
-  ...
+  eps_f = 1e-08,
+  eps_g = 1e-05,
+  maxit = 300L,
+  num_cores = 1
 )
 }
 \arguments{
@@ -25,13 +26,19 @@ fast_hnb_regression(
 We use the default value from \code{base::lm.fit}'s which is 1e-7. If you fit the logistic regression and
 still get p-values near 1 indicating high collinearity, we recommend making this value smaller.}
 
-\item{initial_phi}{Value of initial starting guess for the overdispersion parameter in the count model. Default is \code{10} which is large
-so the negative binomial is approximately acting as a Poisson model.}
+\item{eps_f}{From RcppNumerical. Iteration stops if \eqn{|f-f'|/|f|<\epsilon_f}{|f-f'|/|f|<eps_f},
+where \eqn{f} and \eqn{f'} are the current and previous value
+of the objective function (negative log likelihood) respectively.}
+
+\item{eps_g}{From RcppNumerical. Iteration stops if
+\eqn{||g|| < \epsilon_g * \max(1, ||\beta||)}{||g|| < eps_g * max(1, ||beta||)},
+    where \eqn{\beta}{beta} is the current coefficient vector and
+\eqn{g} is the gradient.}
+
+\item{maxit}{From RcppNumerical. Maximum number of L-BFGS iterations.}
 
 \item{num_cores}{Number of cores to use to speed up matrix multiplication and matrix inversion (used only during inference computation). Default is 1.
 Unless the number of variables, i.e. \code{ncol(Xmm)}, is large, there does not seem to be a performance gain in using multiple cores.}
-
-\item{...}{Other arguments to be passed to \code{fastLR}. See documentation there.}
 }
 \value{
 A list of raw results
