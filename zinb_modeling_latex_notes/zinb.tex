@@ -147,24 +147,21 @@ z_i \natlog{\inverse{1 + \exp{-\eta_i}}} +
 \noindent To simplify this a little bit, note that when $z_i = 1$, the summand simplifies to:
 
 \beqn
--\natlog{1 + \exp{-\eta_i}} &\approx& -\parens{\natlog{2} + \frac{-\eta_i}{2} + \frac{(-\eta_i)^2}{8}} \\
-&=& -\natlog{2} + \frac{\eta_i}{2} - \frac{\eta_i^2}{8}
+-\natlog{1 + \exp{-\eta_i}} 
 \eeqn
 
-\noindent One of the problems is that this can suffer from numerical over/underflow due to the exponentiation. The Taylor series is above on the rhs. 
-
-And when $z_i = 0$, the summand simplifies to:
+\noindent And when $z_i = 0$, the summand simplifies to:
 
 \beqn
 && -\natlog{1 + \exp{\eta_i}} + \\
-&& \parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
+&& \lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}  + \\
 && -(y_i - 1)\natlog{1 + \phi\exp{-\xi_i}} + \\
 && -\phi\natlog{1 + \phi^{-1}\exp{\xi_i}} \\
 %%%%%%%%%%%%%%%%%%%
-&\approx& -\natlog{2} - \frac{\eta_i}{2} - \frac{\eta_i^2}{8} + \\
-&& \parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
-&& -(y_i - 1)\parens{\natlog{2} + \frac{\natlog{\phi} - \xi_i}{2} + \frac{(\natlog{\phi} - \xi_i)^2}{8}} + \\
-&& -\phi \parens{\natlog{2} + \frac{\xi_i - \natlog{\phi}}{2} + \frac{(\xi_i - \natlog{\phi})^2}{8}} \\
+%&\approx& -\natlog{2} - \frac{\eta_i}{2} - \frac{\eta_i^2}{8} + \\
+%&& \parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
+%&& -(y_i - 1)\parens{\natlog{2} + \frac{\natlog{\phi} - \xi_i}{2} + \frac{(\natlog{\phi} - \xi_i)^2}{8}} + \\
+%&& -\phi \parens{\natlog{2} + \frac{\xi_i - \natlog{\phi}}{2} + \frac{(\xi_i - \natlog{\phi})^2}{8}} \\
 \eeqn
 
 \noindent where once again the approximation follows from a Taylor series approximation.
@@ -176,6 +173,7 @@ When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with re
 %\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}
 %\beta_0 + \beta_1 x_{i,1} + \ldots + \beta_p x_{i,p}
 
+%taylor series for 1 / (1 + e^x)
 \beqn
 %\partialop{\ell}{\gamma_0} &:=& \inverse{1 + \exp{\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}}} \\
 \partialop{\ell}{\gamma_k} &:=& x_{i,k} \inverse{1 + \exp{\eta_i}}
@@ -190,15 +188,37 @@ When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with re
 %derivative of -x* ln(1 + (1/x) * exp(c)) wrt x
 \beqn
 %\partialop{\ell}{\gamma_0} &:=& -\inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})} \\
-\partialop{\ell}{\gamma_k} &:=& -x_{i,k} \inverse{1 + \exp{-\eta_i}}  -\phi\inverse{1 + \phi\exp{-\xi_i}}
- \\
-\partialop{\ell}{\beta_k} &:=& x_{i,k} (y_i - 1)\phi \inverse{\phi + \exp{\xi_i}} - x_{i,k} \phi\inverse{1 + \phi\exp{-\xi_i}}
- \\
+\partialop{\ell}{\gamma_k} &:=& -x_{i,k} \inverse{1 + \exp{-\eta_i}} +\\
+&& -\phi\inverse{1 + \phi\exp{-\xi_i}} \\
+\partialop{\ell}{\beta_k} &:=& x_{i,k} (y_i - 1)\phi \inverse{\phi + \exp{\xi_i}} + \\
+&& -x_{i,k} \phi\inverse{1 + \phi\exp{-\xi_i}} \\
 \partialop{\ell}{\phi} &:=& \psi(y_i + \phi - 3) - \psi(\phi - 2)  + \\
 && - (y_i - 1) \inverse{\phi +  \exp{\xi_i}} +  \inverse{1 + \phi \exp{-\xi_i}} - \natlog{\phi + \exp{\xi_i}} + \natlog{\phi}
 \eeqn
 
 \noindent where $\psi$ denots the digamma function.
 
+One of the problems is that many of the terms above can suffer from numerical over/underflow due to the exponentiation. Here are some Taylor series approximations for such computations up the fifth order: 
+
+\beqn
+\natlog{1 + \exp{x}} &\approx& \natlog{2} + \frac{x}{2} + \frac{x^2}{8} - \frac{x^4}{192}\\
+\natlog{1 + \exp{-x}} &\approx& \natlog{2} - \frac{x}{2} + \frac{x^2}{8} - \frac{x^4}{192}\\
+\natlog{1 + c\exp{x}} &=& \natlog{1 + \exp{\natlog{c} + x}} \\
+%&\approx& \natlog{2} + \frac{\natlog{c} + x}{2} + \frac{(\natlog{c} + x)^2}{8} - \frac{(\natlog{c} + x)^4}{192}\\
+\natlog{1 + c\exp{-x}} &=& \natlog{1 + \exp{\natlog{c} - x}} \\
+%&\approx& \natlog{2} + \frac{\natlog{c} - x}{2} + \frac{(\natlog{c} - x)^2}{8} - \frac{(\natlog{c} - x)^4}{192}\\
+\natlog{c + \exp{x}} &=& \natlog{c} + \natlog{1 + \exp{x - \natlog{c}}} \\
+%&\approx& \natlog{c + 1} + \frac{x}{c + 1} + \frac{c x^2}{2 (c + 1)^2} + \frac{(c - 1) c x^3}{6 (c + 1)^3} \\
+%&&+ \frac{c (c^2 - 4 c + 1) x^4}{24 (c + 1)^4} + \frac{c (c^3 - 11 c^2 + 11 c - 1) x^5}{120 (c + 1)^5} \\
+%%%%
+\inverse{1 + \exp{x}} &\approx& \half - \frac{x}{4} + \frac{x^3}{48} - \frac{x^5}{480}\\
+\inverse{1 + \exp{-x}} &\approx& \half + \frac{x}{4} - \frac{x^3}{48} + \frac{x^5}{480}\\
+\inverse{1 + c\exp{x}} &=& \inverse{1 + \exp{\natlog{c} + x}} \\
+%&\approx& \half - \frac{\natlog{c} + x}{4} + \frac{(\natlog{c} + x)^3}{48} - \frac{(\natlog{c} + x)^5}{480}\\
+\inverse{1 + c\exp{-x}} &=& \inverse{1 + \exp{\natlog{c} - x}} \\
+%&\approx& \half - \frac{\natlog{c} - x}{4} + \frac{(\natlog{c} - x)^3}{48} - \frac{(\natlog{c} - x)^5}{480}\\
+\inverse{c + \exp{x}} &=& \oneover{c} \inverse{1 + c^{-1} \exp{x}} \\ 
+%= \oneover{c} \inverse{1 + \exp{\natlog{\oneover{c}} + x}}
+\eeqn
 
 \end{document}
