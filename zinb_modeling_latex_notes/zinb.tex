@@ -147,19 +147,29 @@ z_i \natlog{\inverse{1 + \exp{-\eta_i}}} +
 \noindent To simplify this a little bit, note that when $z_i = 1$, the summand simplifies to:
 
 \beqn
--\natlog{1 + \exp{-\eta_i}}
+-\natlog{1 + \exp{-\eta_i}} &\approx& -\parens{\natlog{2} + \frac{-\eta_i}{2} + \frac{(-\eta_i)^2}{8}} \\
+&=& -\natlog{2} + \frac{\eta_i}{2} - \frac{\eta_i^2}{8}
 \eeqn
 
-\noindent And when $z_i = 0$, the summand simplifies to:
+\noindent One of the problems is that this can suffer from numerical over/underflow due to the exponentiation. The Taylor series is above on the rhs. 
+
+And when $z_i = 0$, the summand simplifies to:
 
 \beqn
 && -\natlog{1 + \exp{\eta_i}} + \\
 && \parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
 && -(y_i - 1)\natlog{1 + \phi\exp{-\xi_i}} + \\
-&& -\phi\natlog{1 + \phi^{-1}\exp{\xi_i}}
+&& -\phi\natlog{1 + \phi^{-1}\exp{\xi_i}} \\
+%%%%%%%%%%%%%%%%%%%
+&\approx& -\natlog{2} - \frac{\eta_i}{2} - \frac{\eta_i^2}{8} + \\
+&& \parens{\lgamma{y_i + \phi - 3} - \lgamma{y_i} - \lgamma{\phi - 2}}  + \\
+&& -(y_i - 1)\parens{\natlog{2} + \frac{\natlog{\phi} - \xi_i}{2} + \frac{(\natlog{\phi} - \xi_i)^2}{8}} + \\
+&& -\phi \parens{\natlog{2} + \frac{\xi_i - \natlog{\phi}}{2} + \frac{(\xi_i - \natlog{\phi})^2}{8}} \\
 \eeqn
 
-\noindent We seek to maximize this quantity over the parameters. We can start the parameters from an intelligent point by fitting a logistic regression to the $z_i$'s and returning a starting point for the $\gamma_j$'s. Then we can fit an OLS model to the $y_i$'s which are nonzero returning a starting point for the $\beta_j$'s.
+\noindent where once again the approximation follows from a Taylor series approximation.
+
+We seek to maximize this quantity over the parameters. We can start the parameters from an intelligent point by fitting a logistic regression to the $z_i$'s and returning a starting point for the $\gamma_j$'s. Then we can fit an OLS model to the $y_i$'s which are nonzero returning a starting point for the $\beta_j$'s.
 
 When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with respect to all of our parameters, i.e. $\gamma_0, \gamma_1, \ldots, \gamma_p, \beta_0, \beta_1, \ldots, \beta_p, \phi$. We now derive them. Assume the first column of the covariate matrix is 1.  First when $z_i = 1$,
 

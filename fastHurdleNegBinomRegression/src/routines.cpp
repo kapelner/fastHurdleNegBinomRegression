@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <RcppNumerical.h>
+
 using namespace Rcpp;
 using namespace Numer;
 using namespace std;
@@ -19,13 +20,14 @@ public:
     HurdleNegativeBinomialRegression(const MapMat X_, const MapVec y_, const MapVec z_) :
         X(X_),
         y(y_),
-        z(y_),
+        z(z_),
         n(X.rows()),
 		p(X.cols())
     {}
 
     //see example here: https://github.com/yixuan/RcppNumerical
     double f_grad(Constvec& thetas, Refvec grad){
+
     	//pull out beta vec and gamma vec and phi from the running theta estimate vector
     	Eigen::VectorXd gammas(p);
     	for (int j = 0; j < p; j++){
@@ -37,68 +39,87 @@ public:
     	}
     	double phi = thetas[2 * p];
 
-    	Rcout << "  gammas " << endl << gammas << " betas " << endl << betas << endl << " phi " << phi << endl;
+    	Rcout << "  gammas " << endl << gammas << endl << " betas " << endl << betas << endl << " phi " << endl << phi << endl;
 
     	//first calculate some useful values to cache
+    	Eigen::VectorXd etas(n);
     	Eigen::VectorXd exp_etas(n);
     	Eigen::VectorXd exp_neg_etas(n);
     	for (int i = 0; i < n; i++){
-    		double eta_i = X.row(i) * gammas;
-    		exp_etas[i] =     exp(eta_i);
-    		exp_neg_etas[i] = exp(-eta_i);
+    		etas[i]     =     X.row(i) * gammas;
+    		exp_etas[i] =     exp(etas[i]);
+    		exp_neg_etas[i] = exp(-etas[i]);
     	}
+    	Eigen::VectorXd xis(n);
     	Eigen::VectorXd exp_xis(n);
     	Eigen::VectorXd exp_neg_xis(n);
     	for (int i = 0; i < n; i++){
-    		double xi_i = X.row(i) * betas;
-        	exp_xis[i] =     exp(xi_i);
-        	exp_neg_xis[i] = exp(-xi_i);
+    		xis[i]     =     X.row(i) * betas;
+        	exp_xis[i] =     exp(xis[i]);
+        	exp_neg_xis[i] = exp(-xis[i]);
     	}
-    	Rcout << "  exp_etas " << endl << exp_etas << " exp_neg_etas " << endl << exp_neg_etas << endl;
-    	Rcout << "  exp_xis "  << endl << exp_xis  << " exp_neg_xis "  << endl << exp_neg_xis  << endl;
+    	Rcout << "  etas "     << endl << etas                                                 << endl;
+//    	Rcout << "  exp_etas " << endl << exp_etas << " exp_neg_etas " << endl << exp_neg_etas << endl;
+    	Rcout << "  xis "      << endl << xis                                                  << endl;
+//    	Rcout << "  exp_xis "  << endl << exp_xis  << " exp_neg_xis "  << endl << exp_neg_xis  << endl;
 
     	//first add up the log likelihood
+    	double ln_two = log(2);
+    	double ln_phi = log(phi);
+		double lgamma_phi_minus_two = lgamma(phi - 2);
+		Rcout << " lgamma_phi_minus_two " << lgamma_phi_minus_two << endl;
     	double loglik = 0;
     	for (int i = 0; i < n; i++){
-    		double inverse_phi = 1 / phi;
-    		double lgamma_phi_minus_two = lgamma(phi - 2);
     		double y_i = y[i];
+    		double eta_i = etas[i];
+    		double eta_i_sq = pow(eta_i, 2);
+    		double xi_i = xis[i];
+    		Rcout << "  loglik calc i " << i << " y_i " << y_i << " z_i " << z[i];
     		if (z[i] == 1){
-    			loglik += -log(1 + exp_neg_etas[i]);
+    			loglik += (-ln_two + eta_i / 2 - eta_i_sq / 8);
     		} else {
-    			loglik += -log(1 + exp_etas[i]) +
-    					   lgamma(y_i + phi - 3) - lgamma(y_i) - lgamma_phi_minus_two +
-						  -(y_i - 1) * log(1 + phi * exp_neg_xis[i]) +
-						  -phi * log(1 + inverse_phi * exp_xis[i]);
+    			loglik += (
+    						-ln_two - eta_i / 2 - eta_i_sq / 8 +
+							lgamma(y_i + phi - 3) - lgamma(y_i) - lgamma_phi_minus_two +
+							-(y_i - 1) * (ln_two + (ln_phi - xi_i) / 2 + pow(ln_phi - xi_i, 2) / 8) +
+							-phi * (ln_two + (xi_i - ln_phi) / 2 + pow(xi_i - ln_phi, 2) / 8)
+						  );
+            	Rcout << " eta_i " << eta_i << " eta_i_sq " << eta_i_sq << " lgamma(y_i) " << lgamma(y_i) << " lgamma(y_i + phi - 3) " << lgamma(y_i + phi - 3) << " (ln_phi - xi_i) " << (ln_phi - xi_i) << endl;
     		}
+        	Rcout << " loglik " << loglik << endl;
     	}
 
-    	Rcout << "  loglik " << loglik << endl;
     	//then compute all the 2 * p + 1 partial derivatives (i.e., the entries in the gradient)
     	for (int j = 0; j < (2 * p + 1); j++){ //initialize
     		grad[j] = 0;
     	}
+    	Rcpp::Function digamma("digamma");
     	for (int i = 0; i < n; i++){
     		Eigen::VectorXd x_i = X.row(i);
+
     		double y_i_minus_one = y[i] - 1;
     		double exp_etas_i = exp_etas[i];
     		double exp_neg_etas_i = exp_neg_etas[i];
     		double exp_xis_i = exp_xis[i];
     		double exp_neg_xis_i = exp_neg_xis[i];
+        	Rcout << "  grad calc i " << i;
+
     		if (z[i] == 1){
             	for (int j = 0; j < p; j++){
             		grad[j] += x_i(j) / (1 + exp_etas_i);
             	}
      		} else {
+            	Rcout << "  y_i_minus_one " << y_i_minus_one << endl;
             	for (int j = 0; j < p; j++){
             		grad[j] -= x_i(j) / (1 + exp_neg_etas_i);
             		grad[j] -= phi / (1 + phi * exp_neg_etas_i);
             	}
             	for (int j = p; j < 2 * p; j++){
-            		grad[j - p] += x_i(j) * y_i_minus_one * phi / (phi + exp_xis_i);
-            		grad[j - p] -= x_i(j) * phi / (1 + phi * exp_neg_xis_i);
+            		grad[j] += x_i(j) * y_i_minus_one * phi / (phi + exp_xis_i);
+            		grad[j] -= x_i(j) * phi / (1 + phi * exp_neg_xis_i);
             	}
-            	grad[2 * p + 1] += 1;
+            	//now handle phi
+            	grad[2 * p] += *REAL(digamma(1.47));
      		}
     	}
 

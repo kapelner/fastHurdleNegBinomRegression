@@ -56,7 +56,7 @@ fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_
 	}
 	
 	#create the augmented data and do some convenient splits
-	z = as.integer(y == 0)
+	z = as.numeric(y == 0)
 	Xmm_y_pos  = Xmm[z == 0, ]
 	y_pos      = y[z == 0]
 	
@@ -98,6 +98,7 @@ fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_
 	flr = fast_hnb_cpp(Xmm, y, z, c(gammas_0, betas_0, initial_phi), eps_f, eps_g, maxit) 
 	flr$Xmm = Xmm
 	flr$y = y
+	flr$z = z
 	flr$gammas_0 = gammas_0
 	flr$betas_0 = betas_0
 	flr$initial_phi = initial_phi

@@ -1,11 +1,13 @@
-setwd("C:/Users/kapel/workspace/fastHurdleNegBinomRegression")
-library(roxygen2); roxygenise("fastHurdleNegBinomRegression", clean = TRUE)
-setwd("C:/Users/kapel/workspace/fastHurdleNegBinomRegression/fastHurdleNegBinomRegression"); Rcpp::compileAttributes()
+# setwd("C:/Users/kapel/workspace/fastHurdleNegBinomRegression")
+# library(roxygen2); roxygenise("fastHurdleNegBinomRegression", clean = TRUE)
+# setwd("C:/Users/kapel/workspace/fastHurdleNegBinomRegression/fastHurdleNegBinomRegression"); Rcpp::compileAttributes()
+# rstudioapi::restartSession()
+
 pacman::p_load(fastHurdleNegBinomRegression, microbenchmark)
 
 set.seed(1984)
 
-n = 300
+n = 10
 p = 3
 X = cbind(1, matrix(runif(n * p, -1, 1), nrow = n, ncol = p))
 gammas = rep(-1, p + 1)
@@ -27,4 +29,6 @@ for (i in 1 : n){
 }
 table(y_is)
 
-hnb_mod = fastHurdleNegBinomRegression::fast_hnb_regression(X, y_is)
+hnb_mod = fastHurdleNegBinomRegression::fast_hnb_regression(X, y_is, maxit = 1L)
+# hnb_mod$Xmm %*% hnb_mod$gammas_0
+# hnb_mod$Xmm %*% hnb_mod$betas_0
