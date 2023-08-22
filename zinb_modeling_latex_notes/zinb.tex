@@ -184,16 +184,18 @@ When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with re
 %wolfram alpha searches
 %derivative of -(y-1)* ln(1 + phi * exp(-(d*x + c))) wrt x
 %derivative of -phi * ln(1 + (1/phi) * exp((x + c))) wrt x
-%derivative of -(y-1)* ln(1 + x * exp(-c)) wrt x
-%derivative of -x* ln(1 + (1/x) * exp(c)) wrt x
+%derivative of  log(1 + d * exp(-(c * x + g))) wrt x
+%derivative of  ln(1 + (1/d) * exp(c * x + g)) wrt x
+%derivative of  x * ln(1 + (1/x) * exp(c)) wrt x
 \beqn
 %\partialop{\ell}{\gamma_0} &:=& -\inverse{1 + \exp{-(\gamma_0 + \gamma_1 x_{i,1} + \ldots + \gamma_p x_{i,p}})} \\
 \partialop{\ell}{\gamma_k} &:=& -x_{i,k} \inverse{1 + \exp{-\eta_i}} +\\
 && -\phi\inverse{1 + \phi\exp{-\xi_i}} \\
-\partialop{\ell}{\beta_k} &:=& x_{i,k} (y_i - 1)\phi \inverse{\phi + \exp{\xi_i}} + \\
+\partialop{\ell}{\beta_k} &:=& -x_{i,k} (y_i - 1)\phi \inverse{\phi + \exp{\xi_i}} + \\
 && -x_{i,k} \phi\inverse{1 + \phi\exp{-\xi_i}} \\
 \partialop{\ell}{\phi} &:=& \psi(y_i + \phi - 3) - \psi(\phi - 2)  + \\
-&& - (y_i - 1) \inverse{\phi +  \exp{\xi_i}} +  \inverse{1 + \phi \exp{-\xi_i}} - \natlog{\phi + \exp{\xi_i}} + \natlog{\phi}
+&& - (y_i - 1) \inverse{\phi + \exp{\xi_i}} + \\
+&& -\natlog{\phi + \exp{\xi_i}} + \inverse{1 + \phi \exp{-\xi_i}} + \natlog{\phi}
 \eeqn
 
 \noindent where $\psi$ denots the digamma function.

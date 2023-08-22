@@ -34,7 +34,7 @@ assert_numeric_matrix = function(Xmm){
 #' 	 Xmm = model.matrix(~ . - type, Pima.te), 
 #'   ybin = as.numeric(Pima.te$type == "Yes")
 #' )
-fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_tol = 1e-7, eps_f = 1e-8, eps_g = 1e-5, maxit = 300L, num_cores = 1){
+fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_tol = 1e-7, eps_f = 1e-6, eps_g = 1e-5, maxit = 300L, num_cores = 1){
 	assert_numeric_matrix(Xmm)
 	assert_vector(y)
 	for (y_i in y){

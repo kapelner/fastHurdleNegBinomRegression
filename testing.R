@@ -32,6 +32,6 @@ table(y_is)
 #standardize X
 Z = apply(X, 2, function(xj){(xj - mean(xj)) / sd(xj)})[, -1]
 
-hnb_mod = fastHurdleNegBinomRegression::fast_hnb_regression(Z, y_is, maxit = 5L)
+hnb_mod = fastHurdleNegBinomRegression::fast_hnb_regression(Z, y_is, maxit = 1L)
 # hnb_mod$Xmm %*% hnb_mod$gammas_0
 # hnb_mod$Xmm %*% hnb_mod$betas_0
