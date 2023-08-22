@@ -93,20 +93,20 @@ fast_hnb_regression = function(Xmm, y, drop_collinear_variables = FALSE, lm_fit_
 	betas_0 = coef(lm.fit(Xmm_y_pos, log(y_pos))) #the neg binomial model fits in log space
 	#to get the best guess of the phi we use MM via the formula from https://mc-stan.org/docs/2_20/functions-reference/nbalt.html
 	mu_y_hat = mean(y_pos - 1)
-	initial_phi = mu_y_hat^2 / (var(y_pos - 1) - mu_y_hat)
+	ln_initial_phi = log(mu_y_hat^2 / (var(y_pos - 1) - mu_y_hat))
 	
-	flr = fast_hnb_cpp(Xmm, y, z, c(gammas_0, betas_0, initial_phi), eps_f, eps_g, maxit) 
+	flr = fast_hnb_cpp(Xmm, y, z, c(gammas_0, betas_0, ln_initial_phi), eps_f, eps_g, maxit) 
 	flr$Xmm = Xmm
 	flr$y = y
 	flr$z = z
 	flr$gammas_0 = gammas_0
 	flr$betas_0 = betas_0
-	flr$initial_phi = initial_phi
+	flr$ln_initial_phi = ln_initial_phi
 	flr$variables_retained = variables_retained
 	if (drop_collinear_variables){
 		flr$collinear_variables = collinear_variables
 		coefs = flr$coefficients #save originals
-		flr$coefficients = array(NA, p)
+		flr$coefficients = array(NA, 2 * p + 1)
 		flr$coefficients[variables_retained] = coefs #all dropped variables will be NA's
 	}
 	names(flr$coefficients) = original_col_names

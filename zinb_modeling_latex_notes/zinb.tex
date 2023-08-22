@@ -200,7 +200,15 @@ When using the L-BFGS algorithm, we also need the gradient $\nabla \ell$ with re
 
 \noindent where $\psi$ denots the digamma function.
 
-One of the problems is that many of the terms above can suffer from numerical over/underflow due to the exponentiation. Here are some Taylor series approximations for such computations up the fifth order: 
+Since $\phi > 0$, this poses a problem in the optimization as the algorithm can explore negative values. Thus, we actually optimize $\natlog{\phi}$ which means we need to find the gradient wrt to its log. By the chain rule,
+
+\beqn
+\partialop{\ell}{\natlog{\phi}} = \partialop{\ell}{\phi} \partialop{\phi}{\natlog{\phi}} =  \phi \partialop{\ell}{\phi}
+\eeqn
+
+\noindent thus we just multiple the above by $\phi$.
+
+Further, there may be numerical over/underflow of some of these computations due to the exponentiation. Here are some Taylor series approximations for such computations up the fifth order: 
 
 \beqn
 \natlog{1 + \exp{x}} &\approx& \natlog{2} + \frac{x}{2} + \frac{x^2}{8} - \frac{x^4}{192}\\

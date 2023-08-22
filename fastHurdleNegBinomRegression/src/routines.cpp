@@ -89,45 +89,32 @@ public:
     	for (int j = p; j < 2 * p; j++){
     		betas[j - p] = thetas[j];
     	}
-    	double phi = thetas[2 * p];
-    	outfile << "  gammas " << endl << gammas << endl << " betas " << endl << betas << endl << " phi " << endl << phi << endl;
+    	double ln_phi = thetas[2 * p];
+    	double phi = exp(ln_phi);
+    	outfile << "  gammas " << endl << gammas << endl << " betas " << endl << betas << endl << " ln_phi " << endl << ln_phi << " phi " << phi << endl;
 
     	//first calculate some useful values to cache
     	Eigen::VectorXd etas(n);
-//    	Eigen::VectorXd exp_etas(n);
-//    	Eigen::VectorXd exp_neg_etas(n);
     	for (int i = 0; i < n; i++){
     		etas[i]     =     X.row(i) * gammas;
-//    		exp_etas[i] =     exp(etas[i]);
-//    		exp_neg_etas[i] = exp(-etas[i]);
     	}
     	Eigen::VectorXd xis(n);
-//    	Eigen::VectorXd exp_xis(n);
-//    	Eigen::VectorXd exp_neg_xis(n);
     	for (int i = 0; i < n; i++){
     		xis[i]     =     X.row(i) * betas;
-//        	exp_xis[i] =     exp(xis[i]);
-//        	exp_neg_xis[i] = exp(-xis[i]);
     	}
-//    	outfile << "  etas "     << endl << etas                                                 << endl;
-//    	outfile << "  exp_etas " << endl << exp_etas << " exp_neg_etas " << endl << exp_neg_etas << endl;
-//    	outfile << "  xis "      << endl << xis                                                  << endl;
-//    	outfile << "  exp_xis "  << endl << exp_xis  << " exp_neg_xis "  << endl << exp_neg_xis  << endl;
 
     	//first add up the log likelihood
-    	double ln_phi = log(phi);
 		double lgamma_phi_minus_two = lgamma(phi - 2);
 		outfile << " lgamma_phi_minus_two " << lgamma_phi_minus_two << endl;
     	double loglik = 0;
     	for (int i = 0; i < n; i++){
     		double y_i = y[i];
     		double eta_i = etas[i];
-//    		double eta_i_sq = pow(eta_i, 2);
     		double xi_i = xis[i];
-    		outfile << "  loglik calc i " << i << " y_i " << y_i << " z_i " << z[i];
+    		outfile << "  loglik calc i " << i << " y_i " << y_i << " z_i " << z[i] << " loglik " << loglik << endl;
     		if (z[i] == 1){
     			loglik += -ln_one_plus_exp_x(-eta_i, use_approx);
-//    			outfile << " ln_one_plus_exp_x(-eta_i) " << ln_one_plus_exp_x(-eta_i, use_approx);
+    			outfile << " ln_one_plus_exp_x(-eta_i) " << ln_one_plus_exp_x(-eta_i, use_approx) << " loglik " << loglik << endl;
     		} else {
     			loglik += (
     						-ln_one_plus_exp_x(eta_i, use_approx) +
@@ -135,13 +122,14 @@ public:
 							-(y_i - 1) * ln_one_plus_c_times_exp_x(-xi_i, ln_phi, use_approx) +
 							-phi * ln_one_plus_c_times_exp_x(xi_i, -ln_phi, use_approx)
 						  );
-//            	outfile << " ln_one_plus_exp_x(eta_i) " << ln_one_plus_exp_x(eta_i, use_approx)
-//            		  << " ln_one_plus_c_times_exp_x(-xi_i, ln_phi) " << ln_one_plus_c_times_exp_x(-xi_i, ln_phi, use_approx)
-//					  << " lgamma(y_i) " << lgamma(y_i) << " lgamma(y_i + phi - 3) " << lgamma(y_i + phi - 3)
-//					  << " ln_one_plus_c_times_exp_x(xi_i, -ln_phi) " << ln_one_plus_c_times_exp_x(xi_i, -ln_phi, use_approx) << endl;
+            	outfile << " ln(1 + exp(eta_i)) " << ln_one_plus_exp_x(eta_i, use_approx)
+            		    << " ln(1 + phi * exp(-xi_i)) " << ln_one_plus_c_times_exp_x(-xi_i, ln_phi, use_approx)
+					    << " lgamma(y_i) " << lgamma(y_i) << " lgamma(y_i + phi - 3) " << lgamma(y_i + phi - 3)
+					    << " ln(1 + phi * exp(xi_i) " << ln_one_plus_c_times_exp_x(xi_i, -ln_phi, use_approx)
+					    << " loglik " << loglik << endl;
     		}
-        	outfile << " loglik " << loglik << endl;
     	}
+    	outfile << " final iteration loglik " << loglik << endl;
 		outfile << endl;
 
     	//then compute all the 2 * p + 1 partial derivatives (i.e., the entries in the gradient)
@@ -156,13 +144,7 @@ public:
 
     		const double y_i_minus_one = y[i] - 1;
     		const double eta_i = etas[i];
-//    		double eta_i_sq = pow(eta_i, 2);
     		const double xi_i = xis[i];
-//    		double exp_etas_i = exp_etas[i];
-//    		double exp_neg_etas_i = exp_neg_etas[i];
-//    		double exp_xis_i = exp_xis[i];
-//    		double exp_neg_xis_i = exp_neg_xis[i];
-//        	outfile << "  grad calc i " << i;
 
     		outfile << "grad calc i " << i << " eta_i " << eta_i << " xi_i " << xi_i << " z_i " << z[i] << " y_i_minus_one " << y_i_minus_one << endl;
     		if (z[i] == 1){
@@ -176,7 +158,7 @@ public:
             		outfile << temp_grad[j] << endl;
             	}
      		} else {
-//            	outfile << "  y_i_minus_one " << y_i_minus_one << endl;
+            	outfile << "  y_i_minus_one " << y_i_minus_one << endl;
             	for (int j = 0; j < p; j++){
             		outfile << " i " << i << " j = gamma_" << j
 						  << " x_i(j) " << x_i(j)
@@ -216,13 +198,20 @@ public:
             	temp_grad[2 * p] -= ln_c_plus_exp_x(xi_i, ln_phi, use_approx);
         		outfile << temp_grad[2 * p] << " --> ";
             	temp_grad[2 * p] += ln_phi;
+        		outfile << temp_grad[2 * p] << " --mult_phi--> ";
+        		temp_grad[2 * p] *= phi;
         		outfile << temp_grad[2 * p] << endl;
      		}
     		outfile << endl;
     	}
+    	//flip the sign as it's for negative log likelihood
+    	for (int j = 0; j < (2 * p + 1); j++){
+    		temp_grad[j] = -temp_grad[j];
+    	}
+
     	grad.noalias() = temp_grad;
 
-    	outfile << "  grad " << endl << grad << endl;
+    	outfile << "  final iteration grad " << endl << grad << endl;
         return -loglik; //we must return the cost as the *negative* log likelihood as the algorithm *minimizes* cost (thus it will maximize likelihood)
     }
 };
@@ -248,6 +237,7 @@ Rcpp::List fast_hnb_cpp(
 	Rcpp::NumericVector theta_hats = Rcpp::clone(theta_start);
 	MapVec thetas(theta_hats.begin(), theta_hats.length());
 
+	remove("log_lbfgs.log");
 	ofstream outfile;
 	outfile.open("log_lbfgs.log");
     // Negative log likelihood

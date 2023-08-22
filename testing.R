@@ -7,7 +7,7 @@ pacman::p_load(fastHurdleNegBinomRegression, microbenchmark)
 
 set.seed(1984)
 
-n = 10
+n = 100
 p = 3
 X = cbind(1, matrix(runif(n * p, -1, 1), nrow = n, ncol = p))
 gammas = rep(-1, p + 1)
@@ -30,8 +30,8 @@ for (i in 1 : n){
 table(y_is)
 
 #standardize X
-Z = apply(X, 2, function(xj){(xj - mean(xj)) / sd(xj)})[, -1]
+# Z = apply(X, 2, function(xj){(xj - mean(xj)) / sd(xj)})[, -1]
 
-hnb_mod = fastHurdleNegBinomRegression::fast_hnb_regression(Z, y_is, maxit = 1L)
+hnb_mod = fastHurdleNegBinomRegression::fast_hnb_regression(X, y_is, maxit = 2L)
 # hnb_mod$Xmm %*% hnb_mod$gammas_0
 # hnb_mod$Xmm %*% hnb_mod$betas_0
